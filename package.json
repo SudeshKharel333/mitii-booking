@@ -1,0 +1,24 @@
+{
+  "name": "mitii-booking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build"  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SudeshKharel333/mitii-booking.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SudeshKharel333/mitii-booking/issues"
+  },
+  "homepage": "https://github.com/SudeshKharel333/mitii-booking#readme",
+  "devDependencies": {
+    "@wordpress/scripts": "^33.0.0"
+  }
+}
