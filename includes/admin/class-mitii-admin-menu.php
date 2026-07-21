@@ -22,11 +22,11 @@ class Mitii_Admin_Menu {
             return;
         }
 
-        $asset_file = include MITII_PLUGIN_DIR . 'build/admin/index.asset.php';
+        $asset_file = include MITII_PLUGIN_DIR . 'build/admin.asset.php';
 
         wp_enqueue_script(
             'mitii-admin',
-            MITII_PLUGIN_URL . 'build/admin/index.js',
+            MITII_PLUGIN_URL . 'build/admin.js',
             $asset_file['dependencies'],
             $asset_file['version'],
             true
