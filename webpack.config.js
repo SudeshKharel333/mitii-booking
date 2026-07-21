@@ -1,12 +1,15 @@
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
+const path = require( 'path' );
 
 module.exports = {
     ...defaultConfig,
     entry: {
-        admin: __dirname + '/src/admin/index.tsx',
+        admin: path.resolve( process.cwd(), 'src/admin', 'index.tsx' ),
+        'public-widget': path.resolve( __dirname, 'src/public-widget', 'index.tsx' ),
+
     },
     output: {
         ...defaultConfig.output,
-        path: __dirname + '/build',
+        path: path.resolve( process.cwd(), 'build' ),
     },
 };
