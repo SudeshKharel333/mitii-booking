@@ -1,0 +1,1 @@
+(()=>{"use strict";const t=window.ReactDOM,e=window.ReactJSXRuntime;function i(){return(0,e.jsx)("h1",{children:"Mitii Admin Dashboard — Hello World"})}const n=document.getElementById("mitii-admin-root");n&&(0,t.createRoot)(n).render((0,e.jsx)(i,{}))})();
