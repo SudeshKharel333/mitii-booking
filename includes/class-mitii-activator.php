@@ -59,5 +59,29 @@ class Mitii_Activator {
             PRIMARY KEY (id)
         ) $charset_collate;";
         dbDelta( $sql_bookings );
+
+
+
+
+
+// ---- Staff <-> Services junction table ----
+$table_staff_services = $wpdb->prefix . 'mitii_staff_services';
+$sql_staff_services = "CREATE TABLE $table_staff_services (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    staff_id BIGINT UNSIGNED NOT NULL,
+    service_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY staff_service_unique (staff_id, service_id)
+) $charset_collate;";
+dbDelta( $sql_staff_services );
+
+
+
+
+
     }
+
+
+    
+
 }

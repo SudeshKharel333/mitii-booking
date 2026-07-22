@@ -33,10 +33,42 @@ class Mitii_Staff_Controller {
         return current_user_can( 'manage_options' );
     }
 
+    // ---- Helper: get the list of service_ids assigned to one staff member ----
+    private static function get_service_ids_for_staff( $staff_id ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mitii_staff_services';
+        $ids = $wpdb->get_col(
+            $wpdb->prepare( "SELECT service_id FROM $table WHERE staff_id = %d", $staff_id )
+        );
+        return array_map( 'intval', $ids );
+    }
+
+    // ---- Helper: replace a staff member's assigned services entirely ----
+    private static function set_services_for_staff( $staff_id, $service_ids ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mitii_staff_services';
+
+        // Remove all existing assignments for this staff member first
+        $wpdb->delete( $table, array( 'staff_id' => $staff_id ) );
+
+        // Then insert the new set
+        foreach ( $service_ids as $service_id ) {
+            $wpdb->insert( $table, array(
+                'staff_id'   => $staff_id,
+                'service_id' => intval( $service_id ),
+            ) );
+        }
+    }
+
     public static function get_staff( $request ) {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_staff';
         $results = $wpdb->get_results( "SELECT * FROM $table ORDER BY id ASC" );
+
+        foreach ( $results as $staff ) {
+            $staff->service_ids = self::get_service_ids_for_staff( $staff->id );
+        }
+
         return rest_ensure_response( $results );
     }
 
@@ -44,9 +76,10 @@ class Mitii_Staff_Controller {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_staff';
 
-        $name  = sanitize_text_field( $request['name'] );
-        $email = sanitize_email( $request['email'] );
-        $bio   = sanitize_textarea_field( $request['bio'] );
+        $name        = sanitize_text_field( $request['name'] );
+        $email       = sanitize_email( $request['email'] );
+        $bio         = sanitize_textarea_field( $request['bio'] );
+        $service_ids = isset( $request['service_ids'] ) ? (array) $request['service_ids'] : array();
 
         if ( empty( $name ) ) {
             return new WP_Error( 'missing_name', 'Staff name is required', array( 'status' => 400 ) );
@@ -58,11 +91,15 @@ class Mitii_Staff_Controller {
             'bio'   => $bio,
         ) );
 
+        $staff_id = $wpdb->insert_id;
+        self::set_services_for_staff( $staff_id, $service_ids );
+
         return rest_ensure_response( array(
-            'id'    => $wpdb->insert_id,
-            'name'  => $name,
-            'email' => $email,
-            'bio'   => $bio,
+            'id'           => $staff_id,
+            'name'         => $name,
+            'email'        => $email,
+            'bio'          => $bio,
+            'service_ids'  => array_map( 'intval', $service_ids ),
         ) );
     }
 
@@ -71,9 +108,10 @@ class Mitii_Staff_Controller {
         $table = $wpdb->prefix . 'mitii_staff';
         $id    = intval( $request['id'] );
 
-        $name  = sanitize_text_field( $request['name'] );
-        $email = sanitize_email( $request['email'] );
-        $bio   = sanitize_textarea_field( $request['bio'] );
+        $name        = sanitize_text_field( $request['name'] );
+        $email       = sanitize_email( $request['email'] );
+        $bio         = sanitize_textarea_field( $request['bio'] );
+        $service_ids = isset( $request['service_ids'] ) ? (array) $request['service_ids'] : array();
 
         if ( empty( $name ) ) {
             return new WP_Error( 'missing_name', 'Staff name is required', array( 'status' => 400 ) );
@@ -89,15 +127,19 @@ class Mitii_Staff_Controller {
             return new WP_Error( 'update_failed', 'Could not update staff member', array( 'status' => 500 ) );
         }
 
+        self::set_services_for_staff( $id, $service_ids );
+
         return rest_ensure_response( array( 'id' => $id, 'message' => 'Staff member updated' ) );
     }
 
     public static function delete_staff( $request ) {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_staff';
+        $junction_table = $wpdb->prefix . 'mitii_staff_services';
         $id    = intval( $request['id'] );
 
         $deleted = $wpdb->delete( $table, array( 'id' => $id ) );
+        $wpdb->delete( $junction_table, array( 'staff_id' => $id ) );
 
         if ( ! $deleted ) {
             return new WP_Error( 'delete_failed', 'Could not delete staff member', array( 'status' => 500 ) );
