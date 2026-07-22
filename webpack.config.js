@@ -3,11 +3,12 @@ const path = require( 'path' );
 
 module.exports = {
     ...defaultConfig,
-    entry: {
-        admin: path.resolve( process.cwd(), 'src/admin', 'index.tsx' ),
-        'public-widget': path.resolve( __dirname, 'src/public-widget', 'index.tsx' ),
-
-    },
+   entry: {
+    'admin-bookings': path.resolve( __dirname, 'src/admin/bookings', 'index.tsx' ),
+    'admin-services': path.resolve( __dirname, 'src/admin/services', 'index.tsx' ),
+    'admin-staff': path.resolve( __dirname, 'src/admin/staff', 'index.tsx' ),
+    'public-widget': path.resolve( __dirname, 'src/public-widget', 'index.tsx' ),
+},
     output: {
         ...defaultConfig.output,
         path: path.resolve( process.cwd(), 'build' ),
