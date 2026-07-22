@@ -19,7 +19,10 @@ require_once MITII_PLUGIN_DIR . 'includes/class-mitii-shortcode.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-customer-auth-controller.php';
 
 register_activation_hook( __FILE__, array( 'Mitii_Activator', 'activate' ) );
+require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-portal-shortcode.php';
 
+add_action( 'init', array( 'Mitii_Customer_Portal_Shortcode', 'register' ) );
+add_action( 'wp_enqueue_scripts', array( 'Mitii_Customer_Portal_Shortcode', 'enqueue_assets' ) );
 
 add_action( 'rest_api_init', array( 'Mitii_Customer_Auth_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Services_Controller', 'register_routes' ) );
