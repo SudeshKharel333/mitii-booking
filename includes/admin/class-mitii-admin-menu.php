@@ -8,32 +8,76 @@ class Mitii_Admin_Menu {
             'Mitii Booking',
             'Mitii Booking',
             'manage_options',
-            'mitii-booking',
-            array( __CLASS__, 'render_page' )
+            'mitii-bookings',
+            array( __CLASS__, 'render_bookings_page' ),
+            'dashicons-calendar-alt'
+        );
+
+        add_submenu_page(
+            'mitii-bookings',
+            'Bookings',
+            'Bookings',
+            'manage_options',
+            'mitii-bookings',
+            array( __CLASS__, 'render_bookings_page' )
+        );
+
+        add_submenu_page(
+            'mitii-bookings',
+            'Services',
+            'Services',
+            'manage_options',
+            'mitii-services',
+            array( __CLASS__, 'render_services_page' )
+        );
+
+        add_submenu_page(
+            'mitii-bookings',
+            'Staff',
+            'Staff',
+            'manage_options',
+            'mitii-staff',
+            array( __CLASS__, 'render_staff_page' )
         );
     }
 
-    public static function render_page() {
-        echo '<div id="mitii-admin-root"></div>';
+    public static function render_bookings_page() {
+        echo '<div id="mitii-bookings-root"></div>';
     }
 
-   public static function enqueue_assets( $hook ) {
-    if ( $hook !== 'toplevel_page_mitii-booking' ) {
-        return;
+    public static function render_services_page() {
+        echo '<div id="mitii-services-root"></div>';
     }
 
-    $asset_file = include MITII_PLUGIN_DIR . 'build/admin.asset.php';
+    public static function render_staff_page() {
+        echo '<div id="mitii-staff-root"></div>';
+    }
 
-    wp_enqueue_script(
-        'mitii-admin',
-        MITII_PLUGIN_URL . 'build/admin.js',
-        $asset_file['dependencies'],
-        $asset_file['version'],
-        true
-    );
+    public static function enqueue_assets( $hook ) {
+        $script_map = array(
+            'toplevel_page_mitii-bookings'          => array( 'admin-bookings', 'mitii-bookings-root' ),
+            'mitii-booking_page_mitii-services'      => array( 'admin-services', 'mitii-services-root' ),
+            'mitii-booking_page_mitii-staff'         => array( 'admin-staff', 'mitii-staff-root' ),
+        );
 
-    wp_localize_script( 'mitii-admin', 'mitiiAdminData', array(
-        'nonce' => wp_create_nonce( 'wp_rest' ),
-    ) );
-}
+        if ( ! isset( $script_map[ $hook ] ) ) {
+            return;
+        }
+
+        list( $handle, $root_id ) = $script_map[ $hook ];
+
+        $asset_file = include MITII_PLUGIN_DIR . "build/{$handle}.asset.php";
+
+        wp_enqueue_script(
+            $handle,
+            MITII_PLUGIN_URL . "build/{$handle}.js",
+            $asset_file['dependencies'],
+            $asset_file['version'],
+            true
+        );
+
+        wp_localize_script( $handle, 'mitiiAdminData', array(
+            'nonce' => wp_create_nonce( 'wp_rest' ),
+        ) );
+    }
 }
