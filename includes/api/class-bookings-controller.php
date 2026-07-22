@@ -17,6 +17,21 @@ class Mitii_Bookings_Controller {
             'callback'            => array( __CLASS__, 'create_booking' ),
             'permission_callback' => '__return_true',
         ) );
+
+ register_rest_route( 'mitii/v1', '/my-bookings', array(
+        'methods'             => 'GET',
+        'callback'            => array( __CLASS__, 'get_my_bookings' ),
+        'permission_callback' => array( __CLASS__, 'check_logged_in' ),
+    ) );
+
+    register_rest_route( 'mitii/v1', '/my-bookings/(?P<id>\d+)/cancel', array(
+        'methods'             => 'POST',
+        'callback'            => array( __CLASS__, 'cancel_my_booking' ),
+        'permission_callback' => array( __CLASS__, 'check_logged_in' ),
+    ) );
+
+
+
     }
 
     public static function get_bookings( $request ) {
@@ -60,4 +75,45 @@ class Mitii_Bookings_Controller {
             'message' => 'Booking created successfully',
         ) );
     }
+public static function check_logged_in() {
+    return is_user_logged_in();
+}
+
+public static function get_my_bookings( $request ) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'mitii_bookings';
+    $user  = wp_get_current_user();
+
+    $results = $wpdb->get_results(
+        $wpdb->prepare( "SELECT * FROM $table WHERE customer_email = %s ORDER BY booking_date DESC, booking_time DESC", $user->user_email )
+    );
+
+    return rest_ensure_response( $results );
+}
+
+public static function cancel_my_booking( $request ) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'mitii_bookings';
+    $user  = wp_get_current_user();
+    $id    = intval( $request['id'] );
+
+    // Confirm this booking actually belongs to the logged-in user before touching it
+    $booking = $wpdb->get_row(
+        $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $id )
+    );
+
+    if ( ! $booking ) {
+        return new WP_Error( 'not_found', 'Booking not found', array( 'status' => 404 ) );
+    }
+
+    if ( $booking->customer_email !== $user->user_email ) {
+        return new WP_Error( 'forbidden', 'You cannot cancel a booking that is not yours', array( 'status' => 403 ) );
+    }
+
+    $wpdb->update( $table, array( 'status' => 'cancelled' ), array( 'id' => $id ) );
+
+    return rest_ensure_response( array( 'id' => $id, 'message' => 'Booking cancelled' ) );
+}
+
+
 }
