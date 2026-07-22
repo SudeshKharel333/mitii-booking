@@ -16,8 +16,12 @@ require_once MITII_PLUGIN_DIR . 'includes/api/class-services-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-staff-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-bookings-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-shortcode.php';
+require_once MITII_PLUGIN_DIR . 'includes/api/class-customer-auth-controller.php';
 
 register_activation_hook( __FILE__, array( 'Mitii_Activator', 'activate' ) );
+
+
+add_action( 'rest_api_init', array( 'Mitii_Customer_Auth_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Services_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Staff_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Bookings_Controller', 'register_routes' ) );
