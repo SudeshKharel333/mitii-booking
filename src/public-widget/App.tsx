@@ -1,56 +1,88 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import SelectService from './steps/SelectService.tsx';
+import SelectStaff from './steps/SelectStaff.tsx'
+import SelectDateTime from './steps/SelectDateTime.tsx';
+import ConfirmDetails from './steps/ConfirmDetails.tsx';
 
-type Service = {
+export type Service = {
     id: number;
     name: string;
     duration_minutes: number;
     price: string;
 };
 
+export type Staff = {
+    id: number;
+    name: string;
+    email: string;
+    bio: string;
+};
+
+export type BookingData = {
+    service: Service | null;
+    staff: Staff | null;
+    date: string;
+    time: string;
+    customerName: string;
+    customerEmail: string;
+};
+
 export default function App() {
-    const [ services, setServices ] = useState<Service[]>( [] );
-    const [ loading, setLoading ] = useState( true );
-    const [ selectedService, setSelectedService ] = useState<Service | null>( null );
+    const [ step, setStep ] = useState( 1 );
+    const [ booking, setBooking ] = useState<BookingData>( {
+        service: null,
+        staff: null,
+        date: '',
+        time: '',
+        customerName: '',
+        customerEmail: '',
+    } );
 
-    useEffect( () => {
-        fetch( '/wp-json/mitii/v1/services' )
-            .then( ( res ) => res.json() )
-            .then( ( data ) => {
-                setServices( data );
-                setLoading( false );
-            } );
-    }, [] );
+    const goNext = () => setStep( ( s ) => s + 1 );
+    const goBack = () => setStep( ( s ) => s - 1 );
 
-    if ( loading ) {
-        return <p>Loading services...</p>;
+    if ( step === 1 ) {
+        return (
+            <SelectService
+                onSelect={ ( service ) => {
+                    setBooking( { ...booking, service } );
+                    goNext();
+                } }
+            />
+        );
     }
 
-    if ( selectedService ) {
+    if ( step === 2 ) {
         return (
-            <div>
-                <h2>You selected: { selectedService.name }</h2>
-                <p>Duration: { selectedService.duration_minutes } minutes</p>
-                <p>Price: ${ selectedService.price }</p>
-                <button onClick={ () => setSelectedService( null ) }>
-                    ← Back to services
-                </button>
-            </div>
+            <SelectStaff
+                onSelect={ ( staff ) => {
+                    setBooking( { ...booking, staff } );
+                    goNext();
+                } }
+                onBack={ goBack }
+            />
+        );
+    }
+
+    if ( step === 3 ) {
+        return (
+            <SelectDateTime
+                onSelect={ ( date, time ) => {
+                    setBooking( { ...booking, date, time } );
+                    goNext();
+                } }
+                onBack={ goBack }
+            />
         );
     }
 
     return (
-        <div>
-            <h2>Choose a Service</h2>
-            { services.length === 0 && <p>No services available yet.</p> }
-            { services.map( ( service ) => (
-                <div
-                    key={ service.id }
-                    onClick={ () => setSelectedService( service ) }
-                    style={ { border: '1px solid #ccc', padding: '10px', marginBottom: '8px', cursor: 'pointer' } }
-                >
-                    <strong>{ service.name }</strong> — ${ service.price } ({ service.duration_minutes } min)
-                </div>
-            ) ) }
-        </div>
+        <ConfirmDetails
+            booking={ booking }
+            onSubmitDetails={ ( name, email ) => {
+                setBooking( { ...booking, customerName: name, customerEmail: email } );
+            } }
+            onBack={ goBack }
+        />
     );
 }
