@@ -20,10 +20,13 @@ export default function LoginForm( { onSuccess, onSwitchToRegister }: Props ) {
         setSubmitting( true );
 
         fetch( '/wp-json/mitii/v1/customer/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify( { email, password } ),
-        } )
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce,
+    },
+    body: JSON.stringify( { email, password } ),
+} )
             .then( ( res ) => res.json() )
             .then( ( data ) => {
                 setSubmitting( false );

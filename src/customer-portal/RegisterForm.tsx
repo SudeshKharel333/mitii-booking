@@ -22,7 +22,10 @@ export default function RegisterForm( { onSuccess, onSwitchToLogin }: Props ) {
 
         fetch( '/wp-json/mitii/v1/customer/register', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json',
+            'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce,
+
+             },
             body: JSON.stringify( { name, email, password } ),
         } )
             .then( ( res ) => res.json() )

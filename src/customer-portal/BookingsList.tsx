@@ -18,29 +18,30 @@ export default function BookingsList( { onChanged }: Props ) {
     const [ loading, setLoading ] = useState( true );
 
     const loadBookings = () => {
-        setLoading( true );
-        fetch( '/wp-json/mitii/v1/my-bookings' )
-            .then( ( res ) => res.json() )
-            .then( ( data ) => {
-                setBookings( data );
-                setLoading( false );
-            } );
-    };
+    setLoading( true );
+    fetch( '/wp-json/mitii/v1/my-bookings', {
+        headers: { 'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce },
+    } )
+        .then( ( res ) => res.json() )
+        .then( ( data ) => {
+            setBookings( data );
+            setLoading( false );
+        } );
+};
 
-    useEffect( () => {
-        loadBookings();
-    }, [] );
+const handleCancel = ( id: number ) => {
+    if ( ! window.confirm( 'Cancel this booking?' ) ) return;
 
-    const handleCancel = ( id: number ) => {
-        if ( ! window.confirm( 'Cancel this booking?' ) ) return;
-
-        fetch( `/wp-json/mitii/v1/my-bookings/${ id }/cancel`, { method: 'POST' } )
-            .then( ( res ) => res.json() )
-            .then( () => {
-                loadBookings();
-                onChanged();
-            } );
-    };
+    fetch( `/wp-json/mitii/v1/my-bookings/${ id }/cancel`, {
+        method: 'POST',
+        headers: { 'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce },
+    } )
+        .then( ( res ) => res.json() )
+        .then( () => {
+            loadBookings();
+            onChanged();
+        } );
+};
 
     if ( loading ) return <p>Loading your bookings...</p>;
     if ( bookings.length === 0 ) return <p>You have no bookings yet.</p>;

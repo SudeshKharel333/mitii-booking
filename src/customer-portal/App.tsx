@@ -15,23 +15,24 @@ export default function App() {
     const [ mode, setMode ] = useState<'login' | 'register'>( 'login' );
     const [ loading, setLoading ] = useState( true );
 
-    const checkLoginStatus = () => {
-        fetch( '/wp-json/mitii/v1/customer/me' )
-            .then( ( res ) => res.json() )
-            .then( ( data ) => {
-                setUser( data );
-                setLoading( false );
-            } );
-    };
+const checkLoginStatus = () => {
+    fetch( '/wp-json/mitii/v1/customer/me', {
+        headers: { 'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce },
+    } )
+        .then( ( res ) => res.json() )
+        .then( ( data ) => {
+            setUser( data );
+            setLoading( false );
+        } );
+};
 
-    useEffect( () => {
-        checkLoginStatus();
-    }, [] );
-
-    const handleLogout = () => {
-        fetch( '/wp-json/mitii/v1/customer/logout', { method: 'POST' } )
-            .then( () => checkLoginStatus() );
-    };
+const handleLogout = () => {
+    fetch( '/wp-json/mitii/v1/customer/logout', {
+        method: 'POST',
+        headers: { 'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce },
+    } )
+        .then( () => checkLoginStatus() );
+};
 
     if ( loading ) return <p>Loading...</p>;
 
