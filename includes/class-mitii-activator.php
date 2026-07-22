@@ -79,6 +79,16 @@ dbDelta( $sql_staff_services );
 
 
 
+
+
+// ---- Register the custom customer role ----
+if ( ! get_role( 'mitii_customer' ) ) {
+    add_role( 'mitii_customer', 'Mitii Customer', array(
+        'read' => true, // allows them to log in and view their own profile/dashboard
+    ) );
+}
+
+
     }
 
 
