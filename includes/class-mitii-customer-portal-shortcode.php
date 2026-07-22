@@ -25,5 +25,14 @@ class Mitii_Customer_Portal_Shortcode {
             $asset_file['version'],
             true
         );
+
+wp_localize_script( 'mitii-customer-portal', 'mitiiPortalData', array(
+        'nonce' => wp_create_nonce( 'wp_rest' ),
+    ) );
+
+
+
+
+
     }
 }
