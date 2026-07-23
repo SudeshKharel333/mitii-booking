@@ -18,19 +18,23 @@ export default function SelectService( { onSelect }: Props ) {
             } );
     }, [] );
 
-    if ( loading ) return <p>Loading services...</p>;
+    if ( loading ) return <p className="mitii-widget-loading">Loading services...</p>;
+
+    if ( services.length === 0 ) {
+        return <p className="mitii-widget-empty">No services available yet.</p>;
+    }
 
     return (
-        <div>
-            <h2>Step 1: Choose a Service</h2>
-            { services.length === 0 && <p>No services available yet.</p> }
+        <div className="mitii-option-list">
             { services.map( ( service ) => (
                 <div
                     key={ service.id }
+                    className="mitii-option-card"
                     onClick={ () => onSelect( service ) }
-                    style={ { border: '1px solid #ccc', padding: '10px', marginBottom: '8px', cursor: 'pointer' } }
                 >
-                    <strong>{ service.name }</strong> — ${ service.price } ({ service.duration_minutes } min)
+                    <div className="mitii-option-name">{ service.name }</div>
+                    <div className="mitii-option-meta">{ service.duration_minutes } minutes</div>
+                    <span className="mitii-option-price">${ service.price }</span>
                 </div>
             ) ) }
         </div>

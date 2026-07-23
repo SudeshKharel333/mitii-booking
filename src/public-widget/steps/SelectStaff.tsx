@@ -19,22 +19,30 @@ export default function SelectStaff( { onSelect, onBack }: Props ) {
             } );
     }, [] );
 
-    if ( loading ) return <p>Loading staff...</p>;
-
     return (
         <div>
-            <h2>Step 2: Choose a Staff Member</h2>
-            <button onClick={ onBack }>← Back</button>
-            { staffList.length === 0 && <p>No staff members available yet.</p> }
-            { staffList.map( ( staff ) => (
-                <div
-                    key={ staff.id }
-                    onClick={ () => onSelect( staff ) }
-                    style={ { border: '1px solid #ccc', padding: '10px', marginBottom: '8px', cursor: 'pointer' } }
-                >
-                    <strong>{ staff.name }</strong>
+            <button className="mitii-widget-btn-back" onClick={ onBack }>← Back</button>
+
+            { loading && <p className="mitii-widget-loading">Loading staff...</p> }
+
+            { ! loading && staffList.length === 0 && (
+                <p className="mitii-widget-empty">No staff members available yet.</p>
+            ) }
+
+            { ! loading && staffList.length > 0 && (
+                <div className="mitii-option-list">
+                    { staffList.map( ( staff ) => (
+                        <div
+                            key={ staff.id }
+                            className="mitii-option-card"
+                            onClick={ () => onSelect( staff ) }
+                        >
+                            <div className="mitii-option-name">{ staff.name }</div>
+                            { staff.bio && <div className="mitii-option-meta">{ staff.bio }</div> }
+                        </div>
+                    ) ) }
                 </div>
-            ) ) }
+            ) }
         </div>
     );
 }

@@ -38,7 +38,6 @@ export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Pr
             .then( ( data ) => {
                 setSubmitting( false );
                 if ( data.code ) {
-                    // WordPress sends an object with a "code" field when there's a WP_Error
                     setError( data.message || 'Something went wrong.' );
                 } else {
                     setSubmitted( true );
@@ -52,36 +51,51 @@ export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Pr
     };
 
     if ( submitted ) {
-        return <h2>✅ Booking confirmed! We'll see you soon.</h2>;
+        return (
+            <div className="mitii-success">
+                <div className="mitii-success-icon">✓</div>
+                <p className="mitii-success-title">Booking confirmed!</p>
+                <p className="mitii-success-subtitle">We'll see you soon. A confirmation has been noted for { booking.date } at { booking.time }.</p>
+            </div>
+        );
     }
 
     return (
         <div>
-            <h2>Step 4: Confirm Your Details</h2>
-            <button onClick={ onBack } disabled={ submitting }>← Back</button>
+            <button className="mitii-widget-btn-back" onClick={ onBack } disabled={ submitting }>← Back</button>
 
-            <div style={ { margin: '12px 0', padding: '10px', background: '#f5f5f0' } }>
-                <p>Service: { booking.service?.name }</p>
-                <p>Staff: { booking.staff?.name }</p>
-                <p>Date: { booking.date } at { booking.time }</p>
+            <div className="mitii-summary">
+                <div className="mitii-summary-row">
+                    <span className="mitii-summary-label">Service</span>
+                    <span className="mitii-summary-value">{ booking.service?.name }</span>
+                </div>
+                <div className="mitii-summary-row">
+                    <span className="mitii-summary-label">Staff</span>
+                    <span className="mitii-summary-value">{ booking.staff?.name }</span>
+                </div>
+                <div className="mitii-summary-row">
+                    <span className="mitii-summary-label">When</span>
+                    <span className="mitii-summary-value">{ booking.date } at { booking.time }</span>
+                </div>
             </div>
 
-            <div>
-                <label>
-                    Your Name: <input type="text" value={ name } onChange={ ( e ) => setName( e.target.value ) } />
-                </label>
-            </div>
-            <div style={ { marginTop: '8px' } }>
-                <label>
-                    Your Email: <input type="email" value={ email } onChange={ ( e ) => setEmail( e.target.value ) } />
-                </label>
+            <div className="mitii-widget-field">
+                <label>Your Name</label>
+                <input type="text" value={ name } onChange={ ( e ) => setName( e.target.value ) } />
             </div>
 
-            { error && <p style={ { color: 'red' } }>{ error }</p> }
+            <div className="mitii-widget-field">
+                <label>Your Email</label>
+                <input type="email" value={ email } onChange={ ( e ) => setEmail( e.target.value ) } />
+            </div>
 
-            <button style={ { marginTop: '12px' } } onClick={ handleSubmit } disabled={ submitting }>
-                { submitting ? 'Submitting...' : 'Confirm Booking' }
-            </button>
+            { error && <p className="mitii-widget-error">{ error }</p> }
+
+            <div className="mitii-widget-btn-row">
+                <button className="mitii-widget-btn mitii-widget-btn-primary" onClick={ handleSubmit } disabled={ submitting }>
+                    { submitting ? 'Submitting...' : 'Confirm Booking' }
+                </button>
+            </div>
         </div>
     );
 }

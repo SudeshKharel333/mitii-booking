@@ -8,32 +8,38 @@ type Props = {
 export default function SelectDateTime( { onSelect, onBack }: Props ) {
     const [ date, setDate ] = useState( '' );
     const [ time, setTime ] = useState( '' );
+    const [ error, setError ] = useState( '' );
 
     const handleContinue = () => {
         if ( ! date || ! time ) {
-            alert( 'Please choose both a date and a time.' );
+            setError( 'Please choose both a date and a time.' );
             return;
         }
+        setError( '' );
         onSelect( date, time );
     };
 
     return (
         <div>
-            <h2>Step 3: Pick Date & Time</h2>
-            <button onClick={ onBack }>← Back</button>
-            <div style={ { marginTop: '12px' } }>
-                <label>
-                    Date: <input type="date" value={ date } onChange={ ( e ) => setDate( e.target.value ) } />
-                </label>
+            <button className="mitii-widget-btn-back" onClick={ onBack }>← Back</button>
+
+            <div className="mitii-widget-field">
+                <label>Date</label>
+                <input type="date" value={ date } onChange={ ( e ) => setDate( e.target.value ) } />
             </div>
-            <div style={ { marginTop: '8px' } }>
-                <label>
-                    Time: <input type="time" value={ time } onChange={ ( e ) => setTime( e.target.value ) } />
-                </label>
+
+            <div className="mitii-widget-field">
+                <label>Time</label>
+                <input type="time" value={ time } onChange={ ( e ) => setTime( e.target.value ) } />
             </div>
-            <button style={ { marginTop: '12px' } } onClick={ handleContinue }>
-                Continue
-            </button>
+
+            { error && <p className="mitii-widget-error">{ error }</p> }
+
+            <div className="mitii-widget-btn-row">
+                <button className="mitii-widget-btn mitii-widget-btn-primary" onClick={ handleContinue }>
+                    Continue
+                </button>
+            </div>
         </div>
     );
 }
