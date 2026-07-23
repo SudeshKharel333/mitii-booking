@@ -81,7 +81,9 @@ public static function check_logged_in() {
 
 public static function get_my_bookings( $request ) {
     global $wpdb;
-    $table = $wpdb->prefix . 'mitii_bookings';
+    $bookings_table  = $wpdb->prefix . 'mitii_bookings';
+    $services_table  = $wpdb->prefix . 'mitii_services';
+    $staff_table     = $wpdb->prefix . 'mitii_staff';
     $customers_table = $wpdb->prefix . 'mitii_customers';
 
     $customer_id = Mitii_Customer_Session::get_current_customer_id();
@@ -89,8 +91,20 @@ public static function get_my_bookings( $request ) {
         $wpdb->prepare( "SELECT email FROM $customers_table WHERE id = %d", $customer_id )
     );
 
+    if ( ! $customer ) {
+        return new WP_Error( 'not_found', 'Customer not found', array( 'status' => 404 ) );
+    }
+
     $results = $wpdb->get_results(
-        $wpdb->prepare( "SELECT * FROM $table WHERE customer_email = %s ORDER BY booking_date DESC, booking_time DESC", $customer->email )
+        $wpdb->prepare(
+            "SELECT b.*, s.name AS service_name, s.price AS service_price, st.name AS staff_name
+             FROM $bookings_table b
+             LEFT JOIN $services_table s ON b.service_id = s.id
+             LEFT JOIN $staff_table st ON b.staff_id = st.id
+             WHERE b.customer_email = %s
+             ORDER BY b.booking_date DESC, b.booking_time DESC",
+            $customer->email
+        )
     );
 
     return rest_ensure_response( $results );
