@@ -1,0 +1,303 @@
+:root {
+  --mitii-teal: #2F6F63;
+  --mitii-teal-dark: #1F4D44;
+  --mitii-teal-light: #E8F1EF;
+  --mitii-gold: #C99A3E;
+  --mitii-gold-light: #FBF0DA;
+  --mitii-paper: #FAF9F6;
+  --mitii-ink: #2A2A28;
+  --mitii-ink-soft: #6B6862;
+  --mitii-border: #E2DFD5;
+  --mitii-danger: #B84C4C;
+}
+
+.mitii-widget * { box-sizing: border-box; }
+
+.mitii-widget {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--mitii-ink);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ---- Ticket-stub card shell ---- */
+.mitii-ticket {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(42, 42, 40, 0.10), 0 1px 3px rgba(42, 42, 40, 0.06);
+  overflow: hidden;
+  position: relative;
+}
+
+.mitii-ticket-header {
+  background: var(--mitii-teal);
+  color: #fff;
+  padding: 22px 26px 18px;
+  position: relative;
+}
+
+.mitii-ticket-header::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background:
+    radial-gradient(circle at 10px 0, transparent 10px, var(--mitii-teal) 10.5px) top left,
+    radial-gradient(circle at calc(100% - 10px) 0, transparent 10px, var(--mitii-teal) 10.5px) top right;
+  background-size: 20px 20px;
+  background-repeat: repeat-x;
+}
+
+.mitii-ticket-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mitii-gold-light);
+  opacity: 0.9;
+  margin: 0 0 4px;
+}
+
+.mitii-ticket-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.mitii-ticket-body {
+  padding: 30px 26px 26px;
+}
+
+/* ---- Progress steps ---- */
+.mitii-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.mitii-step-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.mitii-step-dot.is-done {
+  background: var(--mitii-teal);
+  color: #fff;
+}
+
+.mitii-step-dot.is-active {
+  background: var(--mitii-gold);
+  color: #fff;
+}
+
+.mitii-step-dot.is-pending {
+  background: var(--mitii-paper);
+  border: 1px solid var(--mitii-border);
+  color: var(--mitii-ink-soft);
+}
+
+.mitii-step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--mitii-border);
+}
+
+.mitii-step-line.is-done {
+  background: var(--mitii-teal);
+}
+
+/* ---- Selectable option cards (services / staff) ---- */
+.mitii-option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mitii-option-card {
+  border: 1.5px solid var(--mitii-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.05s ease;
+  background: #fff;
+}
+
+.mitii-option-card:hover {
+  border-color: var(--mitii-teal);
+  background: var(--mitii-teal-light);
+}
+
+.mitii-option-card:active {
+  transform: scale(0.99);
+}
+
+.mitii-option-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--mitii-ink);
+}
+
+.mitii-option-meta {
+  font-size: 13px;
+  color: var(--mitii-ink-soft);
+  margin-top: 2px;
+}
+
+.mitii-option-price {
+  display: inline-block;
+  background: var(--mitii-gold-light);
+  color: #8a6a1f;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  margin-top: 6px;
+}
+
+/* ---- Form fields ---- */
+.mitii-widget-field { margin-bottom: 16px; }
+
+.mitii-widget-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--mitii-ink);
+}
+
+.mitii-widget-field input {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1px solid var(--mitii-border);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--mitii-paper);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.mitii-widget-field input:focus {
+  outline: none;
+  border-color: var(--mitii-teal);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--mitii-teal-light);
+}
+
+/* ---- Summary box on confirm step ---- */
+.mitii-summary {
+  background: var(--mitii-paper);
+  border: 1px dashed var(--mitii-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.mitii-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 4px 0;
+}
+
+.mitii-summary-label {
+  color: var(--mitii-ink-soft);
+}
+
+.mitii-summary-value {
+  font-weight: 600;
+  color: var(--mitii-ink);
+}
+
+/* ---- Buttons ---- */
+.mitii-widget-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 9px;
+  border: none;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+.mitii-widget-btn:active { transform: scale(0.98); }
+
+.mitii-widget-btn-primary { background: var(--mitii-teal); color: #fff; }
+.mitii-widget-btn-primary:hover { background: var(--mitii-teal-dark); }
+.mitii-widget-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.mitii-widget-btn-back {
+  background: none;
+  border: none;
+  color: var(--mitii-ink-soft);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.mitii-widget-btn-back:hover { color: var(--mitii-teal); }
+
+.mitii-widget-btn-row { margin-top: 20px; }
+
+/* ---- Loading / empty / error states ---- */
+.mitii-widget-loading,
+.mitii-widget-empty {
+  text-align: center;
+  color: var(--mitii-ink-soft);
+  padding: 30px 10px;
+  font-size: 14px;
+}
+
+.mitii-widget-error {
+  color: var(--mitii-danger);
+  font-size: 13px;
+  margin: -6px 0 14px;
+}
+
+/* ---- Success screen ---- */
+.mitii-success {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.mitii-success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--mitii-teal-light);
+  color: var(--mitii-teal);
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.mitii-success-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--mitii-teal-dark);
+  margin: 0 0 6px;
+}
+
+.mitii-success-subtitle {
+  font-size: 14px;
+  color: var(--mitii-ink-soft);
+  margin: 0;
+}
