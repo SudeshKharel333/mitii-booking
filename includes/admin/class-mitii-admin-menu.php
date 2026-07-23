@@ -76,6 +76,19 @@ class Mitii_Admin_Menu {
             true
         );
 
+
+    $css_path = MITII_PLUGIN_DIR . "build/{$handle}.css";
+    if ( file_exists( $css_path ) ) {
+        wp_enqueue_style(
+            "{$handle}-style",
+            MITII_PLUGIN_URL . "build/{$handle}.css",
+            array(),
+            $asset_file['version']
+        );
+    }
+
+
+
         wp_localize_script( $handle, 'mitiiAdminData', array(
             'nonce' => wp_create_nonce( 'wp_rest' ),
         ) );
