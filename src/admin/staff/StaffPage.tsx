@@ -1,4 +1,7 @@
+
 import { useEffect, useState } from 'react';
+// @ts-ignore: CSS side-effect import without type declarations
+import '../admin-styles.css';
 
 type Staff = {
     id: number;
@@ -117,7 +120,7 @@ export default function StaffPage() {
     const serviceNameById = ( id: number ) => services.find( ( s ) => s.id === id )?.name || 'Unknown';
 
     return (
-        <div>
+        <div className="mitii-admin">
             <h2>{ editingId !== null ? 'Edit Staff Member' : 'Add New Staff Member' }</h2>
 
             <div style={ { marginBottom: '20px', padding: '14px', background: '#f5f5f0', maxWidth: '420px' } }>

@@ -19,9 +19,17 @@ const checkLoginStatus = () => {
     fetch( '/wp-json/mitii/v1/customer/me', {
         headers: { 'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce },
     } )
-        .then( ( res ) => res.json() )
+        .then( ( res ) => {
+            console.log( 'Response status:', res.status );
+            return res.json();
+        } )
         .then( ( data ) => {
+            console.log( 'Response data:', data );
             setUser( data );
+            setLoading( false );
+        } )
+        .catch( ( err ) => {
+            console.error( 'Fetch failed:', err );
             setLoading( false );
         } );
 };

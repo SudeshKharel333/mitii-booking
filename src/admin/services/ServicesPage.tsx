@@ -103,7 +103,7 @@ export default function ServicesPage() {
     };
 
     return (
-        <div>
+        <div    className="mitii-admin">
             <h2>{ editingId !== null ? 'Edit Service' : 'Add New Service' }</h2>
 
             <div style={ { marginBottom: '20px', padding: '14px', background: '#f5f5f0', maxWidth: '400px' } }>
