@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { BookingData } from '../App';
 
 type Props = {
@@ -7,23 +7,117 @@ type Props = {
     onBack: () => void;
 };
 
+type CurrentCustomer = {
+    logged_in: boolean;
+    id?: number;
+    name?: string;
+    email?: string;
+};
+
+type Mode = 'checking' | 'login' | 'register' | 'guest' | 'authenticated';
+
 export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Props ) {
-    const [ name, setName ] = useState( '' );
-    const [ email, setEmail ] = useState( '' );
+    const [ mode, setMode ] = useState<Mode>( 'checking' );
+    const [ customer, setCustomer ] = useState<CurrentCustomer | null>( null );
+
+    // Login form fields
+    const [ loginEmail, setLoginEmail ] = useState( '' );
+    const [ loginPassword, setLoginPassword ] = useState( '' );
+
+    // Register form fields
+    const [ regName, setRegName ] = useState( '' );
+    const [ regEmail, setRegEmail ] = useState( '' );
+    const [ regPassword, setRegPassword ] = useState( '' );
+
+    // Guest checkout fields
+    const [ guestName, setGuestName ] = useState( '' );
+    const [ guestEmail, setGuestEmail ] = useState( '' );
+
+    const [ error, setError ] = useState( '' );
     const [ submitting, setSubmitting ] = useState( false );
     const [ submitted, setSubmitted ] = useState( false );
-    const [ error, setError ] = useState( '' );
 
-    const handleSubmit = () => {
-        if ( ! name || ! email ) {
-            setError( 'Please enter your name and email.' );
+    const checkAuth = () => {
+        fetch( '/wp-json/mitii/v1/customer/me', { credentials: 'same-origin' } )
+            .then( ( res ) => res.json() )
+            .then( ( data: CurrentCustomer ) => {
+                setCustomer( data );
+                setMode( data.logged_in ? 'authenticated' : 'login' );
+            } )
+            .catch( () => {
+                setMode( 'login' );
+            } );
+    };
+
+    useEffect( () => {
+        checkAuth();
+    }, [] );
+
+    const handleLogin = () => {
+        if ( ! loginEmail || ! loginPassword ) {
+            setError( 'Please enter your email and password.' );
             return;
         }
         setError( '' );
         setSubmitting( true );
 
+        fetch( '/wp-json/mitii/v1/customer/login', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( { email: loginEmail, password: loginPassword } ),
+        } )
+            .then( ( res ) => res.json() )
+            .then( ( data ) => {
+                setSubmitting( false );
+                if ( data.code ) {
+                    setError( data.message || 'Login failed.' );
+                } else {
+                    checkAuth();
+                }
+            } )
+            .catch( () => {
+                setSubmitting( false );
+                setError( 'Network error. Please try again.' );
+            } );
+    };
+
+    const handleRegister = () => {
+        if ( ! regName || ! regEmail || ! regPassword ) {
+            setError( 'All fields are required.' );
+            return;
+        }
+        setError( '' );
+        setSubmitting( true );
+
+        fetch( '/wp-json/mitii/v1/customer/register', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( { name: regName, email: regEmail, password: regPassword } ),
+        } )
+            .then( ( res ) => res.json() )
+            .then( ( data ) => {
+                setSubmitting( false );
+                if ( data.code ) {
+                    setError( data.message || 'Registration failed.' );
+                } else {
+                    checkAuth();
+                }
+            } )
+            .catch( () => {
+                setSubmitting( false );
+                setError( 'Network error. Please try again.' );
+            } );
+    };
+
+    const submitBooking = ( name: string, email: string ) => {
+        setError( '' );
+        setSubmitting( true );
+
         fetch( '/wp-json/mitii/v1/bookings', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify( {
                 service_id: booking.service?.id,
@@ -50,12 +144,28 @@ export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Pr
             } );
     };
 
+    const handleConfirmAsCustomer = () => {
+        if ( ! customer?.name || ! customer?.email ) return;
+        submitBooking( customer.name, customer.email );
+    };
+
+    const handleConfirmAsGuest = () => {
+        if ( ! guestName || ! guestEmail ) {
+            setError( 'Please enter your name and email.' );
+            return;
+        }
+        submitBooking( guestName, guestEmail );
+    };
+
     if ( submitted ) {
         return (
             <div className="mitii-success">
                 <div className="mitii-success-icon">✓</div>
                 <p className="mitii-success-title">Booking confirmed!</p>
-                <p className="mitii-success-subtitle">We'll see you soon. A confirmation has been noted for { booking.date } at { booking.time }.</p>
+                <p className="mitii-success-subtitle">
+                    We'll see you on { booking.date } at { booking.time }.
+                    { mode === 'authenticated' && ' You can view this booking anytime in your account.' }
+                </p>
             </div>
         );
     }
@@ -79,23 +189,118 @@ export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Pr
                 </div>
             </div>
 
-            <div className="mitii-widget-field">
-                <label>Your Name</label>
-                <input type="text" value={ name } onChange={ ( e ) => setName( e.target.value ) } />
-            </div>
+            { mode === 'checking' && <p className="mitii-widget-loading">Checking your account...</p> }
 
-            <div className="mitii-widget-field">
-                <label>Your Email</label>
-                <input type="email" value={ email } onChange={ ( e ) => setEmail( e.target.value ) } />
-            </div>
+            { mode === 'authenticated' && customer && (
+                <div>
+                    <p style={ { fontSize: '14px', marginBottom: '16px' } }>
+                        Booking as <strong>{ customer.name }</strong> ({ customer.email })
+                    </p>
+                    { error && <p className="mitii-widget-error">{ error }</p> }
+                    <div className="mitii-widget-btn-row">
+                        <button
+                            className="mitii-widget-btn mitii-widget-btn-primary"
+                            onClick={ handleConfirmAsCustomer }
+                            disabled={ submitting }
+                        >
+                            { submitting ? 'Submitting...' : 'Confirm Booking' }
+                        </button>
+                    </div>
+                </div>
+            ) }
 
-            { error && <p className="mitii-widget-error">{ error }</p> }
+            { mode === 'login' && (
+                <div>
+                    <div className="mitii-widget-field">
+                        <label>Email</label>
+                        <input type="email" value={ loginEmail } onChange={ ( e ) => setLoginEmail( e.target.value ) } />
+                    </div>
+                    <div className="mitii-widget-field">
+                        <label>Password</label>
+                        <input type="password" value={ loginPassword } onChange={ ( e ) => setLoginPassword( e.target.value ) } />
+                    </div>
 
-            <div className="mitii-widget-btn-row">
-                <button className="mitii-widget-btn mitii-widget-btn-primary" onClick={ handleSubmit } disabled={ submitting }>
-                    { submitting ? 'Submitting...' : 'Confirm Booking' }
-                </button>
-            </div>
+                    { error && <p className="mitii-widget-error">{ error }</p> }
+
+                    <div className="mitii-widget-btn-row">
+                        <button className="mitii-widget-btn mitii-widget-btn-primary" onClick={ handleLogin } disabled={ submitting }>
+                            { submitting ? 'Logging in...' : 'Log In & Confirm' }
+                        </button>
+                    </div>
+
+                    <p style={ { fontSize: '13px', textAlign: 'center', margin: '14px 0 0' } }>
+                        <a href="#" onClick={ ( e ) => { e.preventDefault(); setError( '' ); setMode( 'register' ); } }>
+                            Create an account
+                        </a>
+                        { ' · ' }
+                        <a href="#" onClick={ ( e ) => { e.preventDefault(); setError( '' ); setMode( 'guest' ); } }>
+                            Continue as guest
+                        </a>
+                    </p>
+                </div>
+            ) }
+
+            { mode === 'register' && (
+                <div>
+                    <div className="mitii-widget-field">
+                        <label>Name</label>
+                        <input type="text" value={ regName } onChange={ ( e ) => setRegName( e.target.value ) } />
+                    </div>
+                    <div className="mitii-widget-field">
+                        <label>Email</label>
+                        <input type="email" value={ regEmail } onChange={ ( e ) => setRegEmail( e.target.value ) } />
+                    </div>
+                    <div className="mitii-widget-field">
+                        <label>Password</label>
+                        <input type="password" value={ regPassword } onChange={ ( e ) => setRegPassword( e.target.value ) } />
+                    </div>
+
+                    { error && <p className="mitii-widget-error">{ error }</p> }
+
+                    <div className="mitii-widget-btn-row">
+                        <button className="mitii-widget-btn mitii-widget-btn-primary" onClick={ handleRegister } disabled={ submitting }>
+                            { submitting ? 'Creating account...' : 'Create Account & Confirm' }
+                        </button>
+                    </div>
+
+                    <p style={ { fontSize: '13px', textAlign: 'center', margin: '14px 0 0' } }>
+                        <a href="#" onClick={ ( e ) => { e.preventDefault(); setError( '' ); setMode( 'login' ); } }>
+                            Already have an account? Log in
+                        </a>
+                        { ' · ' }
+                        <a href="#" onClick={ ( e ) => { e.preventDefault(); setError( '' ); setMode( 'guest' ); } }>
+                            Continue as guest
+                        </a>
+                    </p>
+                </div>
+            ) }
+
+            { mode === 'guest' && (
+                <div>
+                    <div className="mitii-widget-field">
+                        <label>Your Name</label>
+                        <input type="text" value={ guestName } onChange={ ( e ) => setGuestName( e.target.value ) } />
+                    </div>
+                    <div className="mitii-widget-field">
+                        <label>Your Email</label>
+                        <input type="email" value={ guestEmail } onChange={ ( e ) => setGuestEmail( e.target.value ) } />
+                    </div>
+
+                    { error && <p className="mitii-widget-error">{ error }</p> }
+
+                    <div className="mitii-widget-btn-row">
+                        <button className="mitii-widget-btn mitii-widget-btn-primary" onClick={ handleConfirmAsGuest } disabled={ submitting }>
+                            { submitting ? 'Submitting...' : 'Confirm Booking' }
+                        </button>
+                    </div>
+
+                    <p style={ { fontSize: '13px', textAlign: 'center', margin: '14px 0 0' } }>
+                        <a href="#" onClick={ ( e ) => { e.preventDefault(); setError( '' ); setMode( 'login' ); } }>
+                            Have an account? Log in instead
+                        </a>
+                    </p>
+                </div>
+            ) }
         </div>
     );
 }
