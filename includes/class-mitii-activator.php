@@ -77,7 +77,31 @@ dbDelta( $sql_staff_services );
 
 
 
+// ---- Mitii customers (separate from wp_users entirely) ----
+$table_customers = $wpdb->prefix . 'mitii_customers';
+$sql_customers = "CREATE TABLE $table_customers (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY email_unique (email)
+) $charset_collate;";
+dbDelta( $sql_customers );
 
+// ---- Active login sessions for customers ----
+$table_sessions = $wpdb->prefix . 'mitii_customer_sessions';
+$sql_sessions = "CREATE TABLE $table_sessions (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    customer_id BIGINT UNSIGNED NOT NULL,
+    token_hash VARCHAR(64) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY token_hash_unique (token_hash)
+) $charset_collate;";
+dbDelta( $sql_sessions );
 
 
 
