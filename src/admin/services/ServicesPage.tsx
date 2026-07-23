@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+// @ts-ignore: side-effect import for stylesheet without type declarations
+import '../admin-styles.css';
 
 type Service = {
     id: number;
@@ -11,7 +13,6 @@ export default function ServicesPage() {
     const [ services, setServices ] = useState<Service[]>( [] );
     const [ loading, setLoading ] = useState( true );
 
-    // Form fields — used for both "add new" and "edit existing"
     const [ editingId, setEditingId ] = useState<number | null>( null );
     const [ name, setName ] = useState( '' );
     const [ duration, setDuration ] = useState( '30' );
@@ -103,58 +104,72 @@ export default function ServicesPage() {
     };
 
     return (
-        <div    className="mitii-admin">
-            <h2>{ editingId !== null ? 'Edit Service' : 'Add New Service' }</h2>
+        <div className="mitii-admin">
+            <h1>Services</h1>
+            <p className="mitii-subtitle">Manage what customers can book.</p>
 
-            <div style={ { marginBottom: '20px', padding: '14px', background: '#f5f5f0', maxWidth: '400px' } }>
-                <div>
-                    <label>Name: <input type="text" value={ name } onChange={ ( e ) => setName( e.target.value ) } /></label>
+            <div className="mitii-card">
+                <h2>{ editingId !== null ? 'Edit Service' : 'Add New Service' }</h2>
+
+                <div className="mitii-field">
+                    <label>Name</label>
+                    <input type="text" value={ name } onChange={ ( e ) => setName( e.target.value ) } />
                 </div>
-                <div style={ { marginTop: '8px' } }>
-                    <label>Duration (minutes): <input type="number" value={ duration } onChange={ ( e ) => setDuration( e.target.value ) } /></label>
+                <div className="mitii-field">
+                    <label>Duration (minutes)</label>
+                    <input type="number" value={ duration } onChange={ ( e ) => setDuration( e.target.value ) } />
                 </div>
-                <div style={ { marginTop: '8px' } }>
-                    <label>Price ($): <input type="number" step="0.01" value={ price } onChange={ ( e ) => setPrice( e.target.value ) } /></label>
+                <div className="mitii-field">
+                    <label>Price ($)</label>
+                    <input type="number" step="0.01" value={ price } onChange={ ( e ) => setPrice( e.target.value ) } />
                 </div>
 
-                { error && <p style={ { color: 'red' } }>{ error }</p> }
+                { error && <p className="mitii-error">{ error }</p> }
 
-                <div style={ { marginTop: '10px' } }>
-                    <button onClick={ handleSubmit }>{ editingId !== null ? 'Save Changes' : 'Add Service' }</button>
-                    { editingId !== null && <button onClick={ resetForm } style={ { marginLeft: '8px' } }>Cancel</button> }
+                <div className="mitii-btn-row">
+                    <button className="mitii-btn mitii-btn-primary" onClick={ handleSubmit }>
+                        { editingId !== null ? 'Save Changes' : 'Add Service' }
+                    </button>
+                    { editingId !== null && (
+                        <button className="mitii-btn mitii-btn-secondary" onClick={ resetForm }>Cancel</button>
+                    ) }
                 </div>
             </div>
 
             <h2>Existing Services</h2>
-            { loading && <p>Loading...</p> }
-            { ! loading && services.length === 0 && <p>No services yet.</p> }
+            { loading && <p className="mitii-subtitle">Loading...</p> }
+            { ! loading && services.length === 0 && (
+                <div className="mitii-empty-state">No services yet — add your first one above.</div>
+            ) }
             { ! loading && services.length > 0 && (
-                <table style={ { borderCollapse: 'collapse', width: '100%', maxWidth: '600px' } }>
-                    <thead>
-                        <tr>
-                            <th style={ cellStyle }>Name</th>
-                            <th style={ cellStyle }>Duration</th>
-                            <th style={ cellStyle }>Price</th>
-                            <th style={ cellStyle }>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { services.map( ( s ) => (
-                            <tr key={ s.id }>
-                                <td style={ cellStyle }>{ s.name }</td>
-                                <td style={ cellStyle }>{ s.duration_minutes } min</td>
-                                <td style={ cellStyle }>${ s.price }</td>
-                                <td style={ cellStyle }>
-                                    <button onClick={ () => startEdit( s ) }>Edit</button>
-                                    <button onClick={ () => handleDelete( s.id ) } style={ { marginLeft: '6px' } }>Delete</button>
-                                </td>
+                <div className="mitii-table-wrap">
+                    <table className="mitii-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Duration</th>
+                                <th>Price</th>
+                                <th>Actions</th>
                             </tr>
-                        ) ) }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            { services.map( ( s ) => (
+                                <tr key={ s.id }>
+                                    <td>{ s.name }</td>
+                                    <td>{ s.duration_minutes } min</td>
+                                    <td>${ s.price }</td>
+                                    <td>
+                                        <div className="mitii-btn-row">
+                                            <button className="mitii-btn mitii-btn-secondary mitii-btn-sm" onClick={ () => startEdit( s ) }>Edit</button>
+                                            <button className="mitii-btn mitii-btn-danger mitii-btn-sm" onClick={ () => handleDelete( s.id ) }>Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) ) }
+                        </tbody>
+                    </table>
+                </div>
             ) }
         </div>
     );
 }
-
-const cellStyle = { border: '1px solid #ccc', padding: '8px', textAlign: 'left' as const };

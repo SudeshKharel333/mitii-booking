@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from 'react';
-// @ts-ignore: CSS side-effect import without type declarations
+// @ts-ignore: side-effect import for stylesheet without type declarations
 import '../admin-styles.css';
 
 type Staff = {
@@ -121,76 +120,108 @@ export default function StaffPage() {
 
     return (
         <div className="mitii-admin">
-            <h2>{ editingId !== null ? 'Edit Staff Member' : 'Add New Staff Member' }</h2>
+            <h1>Staff</h1>
+            <p className="mitii-subtitle">Manage your team and which services each person offers.</p>
 
-            <div style={ { marginBottom: '20px', padding: '14px', background: '#f5f5f0', maxWidth: '420px' } }>
-                <div>
-                    <label>Name: <input type="text" value={ name } onChange={ ( e ) => setName( e.target.value ) } /></label>
-                </div>
-                <div style={ { marginTop: '8px' } }>
-                    <label>Email: <input type="email" value={ email } onChange={ ( e ) => setEmail( e.target.value ) } /></label>
-                </div>
-                <div style={ { marginTop: '8px' } }>
-                    <label>Bio: <textarea value={ bio } onChange={ ( e ) => setBio( e.target.value ) } /></label>
+            <div className="mitii-card">
+                <h2>{ editingId !== null ? 'Edit Staff Member' : 'Add New Staff Member' }</h2>
+
+                <div className="mitii-field">
+                    <label>Name</label>
+                    <input type="text" value={ name } onChange={ ( e ) => setName( e.target.value ) } />
                 </div>
 
-                <div style={ { marginTop: '12px' } }>
-                    <strong>Assigned Services:</strong>
-                    { services.length === 0 && <p>No services exist yet — add one first on the Services page.</p> }
-                    { services.map( ( service ) => (
-                        <div key={ service.id }>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={ selectedServiceIds.includes( service.id ) }
-                                    onChange={ () => toggleService( service.id ) }
-                                />
-                                { ' ' }{ service.name }
-                            </label>
+                <div className="mitii-field">
+                    <label>Email</label>
+                    <input type="email" value={ email } onChange={ ( e ) => setEmail( e.target.value ) } />
+                </div>
+
+                <div className="mitii-field">
+                    <label>Bio</label>
+                    <textarea value={ bio } onChange={ ( e ) => setBio( e.target.value ) } />
+                </div>
+
+                <div className="mitii-field">
+                    <label>Assigned Services</label>
+                    { services.length === 0 ? (
+                        <p className="mitii-hint">No services exist yet — add one first on the Services page.</p>
+                    ) : (
+                        <div className="mitii-checkbox-list">
+                            { services.map( ( service ) => (
+                                <label key={ service.id }>
+                                    <input
+                                        type="checkbox"
+                                        checked={ selectedServiceIds.includes( service.id ) }
+                                        onChange={ () => toggleService( service.id ) }
+                                    />
+                                    { service.name }
+                                </label>
+                            ) ) }
                         </div>
-                    ) ) }
+                    ) }
                 </div>
 
-                { error && <p style={ { color: 'red' } }>{ error }</p> }
+                { error && <p className="mitii-error">{ error }</p> }
 
-                <div style={ { marginTop: '10px' } }>
-                    <button onClick={ handleSubmit }>{ editingId !== null ? 'Save Changes' : 'Add Staff Member' }</button>
-                    { editingId !== null && <button onClick={ resetForm } style={ { marginLeft: '8px' } }>Cancel</button> }
+                <div className="mitii-btn-row">
+                    <button className="mitii-btn mitii-btn-primary" onClick={ handleSubmit }>
+                        { editingId !== null ? 'Save Changes' : 'Add Staff Member' }
+                    </button>
+                    { editingId !== null && (
+                        <button className="mitii-btn mitii-btn-secondary" onClick={ resetForm }>Cancel</button>
+                    ) }
                 </div>
             </div>
 
             <h2>Existing Staff</h2>
-            { loading && <p>Loading...</p> }
-            { ! loading && staffList.length === 0 && <p>No staff members yet.</p> }
+
+            { loading && <p className="mitii-subtitle">Loading...</p> }
+
+            { ! loading && staffList.length === 0 && (
+                <div className="mitii-empty-state">No staff members yet — add your first one above.</div>
+            ) }
+
             { ! loading && staffList.length > 0 && (
-                <table style={ { borderCollapse: 'collapse', width: '100%', maxWidth: '700px' } }>
-                    <thead>
-                        <tr>
-                            <th style={ cellStyle }>Name</th>
-                            <th style={ cellStyle }>Email</th>
-                            <th style={ cellStyle }>Services</th>
-                            <th style={ cellStyle }>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { staffList.map( ( s ) => (
-                            <tr key={ s.id }>
-                                <td style={ cellStyle }>{ s.name }</td>
-                                <td style={ cellStyle }>{ s.email }</td>
-                                <td style={ cellStyle }>
-                                    { ( s.service_ids || [] ).map( ( id ) => serviceNameById( id ) ).join( ', ' ) || '—' }
-                                </td>
-                                <td style={ cellStyle }>
-                                    <button onClick={ () => startEdit( s ) }>Edit</button>
-                                    <button onClick={ () => handleDelete( s.id ) } style={ { marginLeft: '6px' } }>Delete</button>
-                                </td>
+                <div className="mitii-table-wrap">
+                    <table className="mitii-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Services</th>
+                                <th>Actions</th>
                             </tr>
-                        ) ) }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            { staffList.map( ( s ) => (
+                                <tr key={ s.id }>
+                                    <td>{ s.name }</td>
+                                    <td>{ s.email }</td>
+                                    <td>
+                                        { ( s.service_ids || [] ).map( ( id ) => serviceNameById( id ) ).join( ', ' ) || '—' }
+                                    </td>
+                                    <td>
+                                        <div className="mitii-btn-row">
+                                            <button
+                                                className="mitii-btn mitii-btn-secondary mitii-btn-sm"
+                                                onClick={ () => startEdit( s ) }
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="mitii-btn mitii-btn-danger mitii-btn-sm"
+                                                onClick={ () => handleDelete( s.id ) }
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) ) }
+                        </tbody>
+                    </table>
+                </div>
             ) }
         </div>
     );
 }
-
-const cellStyle = { border: '1px solid #ccc', padding: '8px', textAlign: 'left' as const };
