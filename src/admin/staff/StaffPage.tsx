@@ -109,7 +109,7 @@ export default function StaffPage() {
 
         fetch( `/wp-json/mitii/v1/staff/${ id }`, {
             method: 'DELETE',
-            headers: { 'X-WP-Nonce': ( window as any ).mitiiAdminData?.nonce },
+    credentials: 'same-origin',
         } )
             .then( ( res ) => res.json() )
             .then( () => loadAll() )

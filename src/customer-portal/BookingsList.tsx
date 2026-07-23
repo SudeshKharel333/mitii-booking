@@ -20,7 +20,7 @@ export default function BookingsList( { onChanged }: Props ) {
     const loadBookings = () => {
     setLoading( true );
     fetch( '/wp-json/mitii/v1/my-bookings', {
-        headers: { 'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce },
+    credentials: 'same-origin',
     } )
         .then( ( res ) => res.json() )
         .then( ( data ) => {
@@ -34,7 +34,7 @@ const handleCancel = ( id: number ) => {
 
     fetch( `/wp-json/mitii/v1/my-bookings/${ id }/cancel`, {
         method: 'POST',
-        headers: { 'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce },
+    credentials: 'same-origin',
     } )
         .then( ( res ) => res.json() )
         .then( () => {

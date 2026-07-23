@@ -17,7 +17,7 @@ export default function App() {
 
 const checkLoginStatus = () => {
     fetch( '/wp-json/mitii/v1/customer/me', {
-        headers: { 'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce },
+    credentials: 'same-origin',
     } )
         .then( ( res ) => {
             console.log( 'Response status:', res.status );
@@ -37,7 +37,7 @@ const checkLoginStatus = () => {
 const handleLogout = () => {
     fetch( '/wp-json/mitii/v1/customer/logout', {
         method: 'POST',
-        headers: { 'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce },
+    credentials: 'same-origin',
     } )
         .then( () => checkLoginStatus() );
 };
