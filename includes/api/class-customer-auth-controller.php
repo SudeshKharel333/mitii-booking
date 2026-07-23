@@ -30,9 +30,12 @@ class Mitii_Customer_Auth_Controller {
     }
 
     public static function register_customer( $request ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mitii_customers';
+
         $name     = sanitize_text_field( $request['name'] );
         $email    = sanitize_email( $request['email'] );
-        $password = $request['password']; // never sanitize passwords — it can corrupt them
+        $password = $request['password'];
 
         if ( empty( $name ) || empty( $email ) || empty( $password ) ) {
             return new WP_Error( 'missing_fields', 'Name, email, and password are all required', array( 'status' => 400 ) );
@@ -42,45 +45,39 @@ class Mitii_Customer_Auth_Controller {
             return new WP_Error( 'invalid_email', 'Please enter a valid email address', array( 'status' => 400 ) );
         }
 
-        if ( email_exists( $email ) ) {
-            return new WP_Error( 'email_taken', 'An account with this email already exists', array( 'status' => 400 ) );
-        }
-
         if ( strlen( $password ) < 8 ) {
             return new WP_Error( 'weak_password', 'Password must be at least 8 characters', array( 'status' => 400 ) );
         }
 
-        // WordPress needs a username too — generate one from the email
-        $username = sanitize_user( current( explode( '@', $email ) ) );
-        if ( username_exists( $username ) ) {
-            $username .= '_' . wp_rand( 100, 999 );
+        $existing = $wpdb->get_row(
+            $wpdb->prepare( "SELECT id FROM $table WHERE email = %s", $email )
+        );
+        if ( $existing ) {
+            return new WP_Error( 'email_taken', 'An account with this email already exists', array( 'status' => 400 ) );
         }
 
-        $user_id = wp_insert_user( array(
-            'user_login' => $username,
-            'user_email' => $email,
-            'user_pass'  => $password, // wp_insert_user hashes this internally
-            'display_name' => $name,
-            'first_name' => $name,
-            'role'       => 'mitii_customer',
+        $password_hash = wp_hash_password( $password );
+
+        $wpdb->insert( $table, array(
+            'name'          => $name,
+            'email'         => $email,
+            'password_hash' => $password_hash,
         ) );
 
-        if ( is_wp_error( $user_id ) ) {
-            return new WP_Error( 'registration_failed', $user_id->get_error_message(), array( 'status' => 500 ) );
-        }
-
-        // Log them in immediately after registering
-        wp_set_current_user( $user_id );
-        wp_set_auth_cookie( $user_id );
+        $customer_id = $wpdb->insert_id;
+        Mitii_Customer_Session::create_session( $customer_id );
 
         return rest_ensure_response( array(
-            'id'    => $user_id,
+            'id'    => $customer_id,
             'name'  => $name,
             'email' => $email,
         ) );
     }
 
     public static function login_customer( $request ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mitii_customers';
+
         $email    = sanitize_email( $request['email'] );
         $password = $request['password'];
 
@@ -88,46 +85,50 @@ class Mitii_Customer_Auth_Controller {
             return new WP_Error( 'missing_fields', 'Email and password are required', array( 'status' => 400 ) );
         }
 
-        $user = get_user_by( 'email', $email );
-        if ( ! $user ) {
-            return new WP_Error( 'invalid_credentials', 'No account found with that email', array( 'status' => 401 ) );
-        }
+        $customer = $wpdb->get_row(
+            $wpdb->prepare( "SELECT * FROM $table WHERE email = %s", $email )
+        );
 
-        $signon = wp_signon( array(
-            'user_login'    => $user->user_login,
-            'user_password' => $password,
-            'remember'      => true,
-        ) );
-
-        if ( is_wp_error( $signon ) ) {
+        if ( ! $customer || ! wp_check_password( $password, $customer->password_hash ) ) {
             return new WP_Error( 'invalid_credentials', 'Incorrect email or password', array( 'status' => 401 ) );
         }
 
-        wp_set_current_user( $signon->ID );
+        Mitii_Customer_Session::create_session( $customer->id );
 
         return rest_ensure_response( array(
-            'id'    => $signon->ID,
-            'name'  => $signon->display_name,
-            'email' => $signon->user_email,
+            'id'    => $customer->id,
+            'name'  => $customer->name,
+            'email' => $customer->email,
         ) );
     }
 
     public static function logout_customer( $request ) {
-        wp_logout();
+        Mitii_Customer_Session::destroy_session();
         return rest_ensure_response( array( 'message' => 'Logged out' ) );
     }
 
     public static function get_current_customer( $request ) {
-        if ( ! is_user_logged_in() ) {
+        $customer_id = Mitii_Customer_Session::get_current_customer_id();
+
+        if ( ! $customer_id ) {
             return rest_ensure_response( array( 'logged_in' => false ) );
         }
 
-        $user = wp_get_current_user();
+        global $wpdb;
+        $table = $wpdb->prefix . 'mitii_customers';
+        $customer = $wpdb->get_row(
+            $wpdb->prepare( "SELECT id, name, email FROM $table WHERE id = %d", $customer_id )
+        );
+
+        if ( ! $customer ) {
+            return rest_ensure_response( array( 'logged_in' => false ) );
+        }
+
         return rest_ensure_response( array(
             'logged_in' => true,
-            'id'        => $user->ID,
-            'name'      => $user->display_name,
-            'email'     => $user->user_email,
+            'id'        => $customer->id,
+            'name'      => $customer->name,
+            'email'     => $customer->email,
         ) );
     }
 }

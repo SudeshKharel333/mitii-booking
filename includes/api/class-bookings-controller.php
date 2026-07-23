@@ -76,16 +76,21 @@ class Mitii_Bookings_Controller {
         ) );
     }
 public static function check_logged_in() {
-    return is_user_logged_in();
+    return Mitii_Customer_Session::get_current_customer_id() !== null;
 }
 
 public static function get_my_bookings( $request ) {
     global $wpdb;
     $table = $wpdb->prefix . 'mitii_bookings';
-    $user  = wp_get_current_user();
+    $customers_table = $wpdb->prefix . 'mitii_customers';
+
+    $customer_id = Mitii_Customer_Session::get_current_customer_id();
+    $customer = $wpdb->get_row(
+        $wpdb->prepare( "SELECT email FROM $customers_table WHERE id = %d", $customer_id )
+    );
 
     $results = $wpdb->get_results(
-        $wpdb->prepare( "SELECT * FROM $table WHERE customer_email = %s ORDER BY booking_date DESC, booking_time DESC", $user->user_email )
+        $wpdb->prepare( "SELECT * FROM $table WHERE customer_email = %s ORDER BY booking_date DESC, booking_time DESC", $customer->email )
     );
 
     return rest_ensure_response( $results );
@@ -94,19 +99,21 @@ public static function get_my_bookings( $request ) {
 public static function cancel_my_booking( $request ) {
     global $wpdb;
     $table = $wpdb->prefix . 'mitii_bookings';
-    $user  = wp_get_current_user();
-    $id    = intval( $request['id'] );
+    $customers_table = $wpdb->prefix . 'mitii_customers';
+    $id = intval( $request['id'] );
 
-    // Confirm this booking actually belongs to the logged-in user before touching it
-    $booking = $wpdb->get_row(
-        $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $id )
+    $customer_id = Mitii_Customer_Session::get_current_customer_id();
+    $customer = $wpdb->get_row(
+        $wpdb->prepare( "SELECT email FROM $customers_table WHERE id = %d", $customer_id )
     );
+
+    $booking = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $id ) );
 
     if ( ! $booking ) {
         return new WP_Error( 'not_found', 'Booking not found', array( 'status' => 404 ) );
     }
 
-    if ( $booking->customer_email !== $user->user_email ) {
+    if ( $booking->customer_email !== $customer->email ) {
         return new WP_Error( 'forbidden', 'You cannot cancel a booking that is not yours', array( 'status' => 403 ) );
     }
 
@@ -114,6 +121,5 @@ public static function cancel_my_booking( $request ) {
 
     return rest_ensure_response( array( 'id' => $id, 'message' => 'Booking cancelled' ) );
 }
-
 
 }
