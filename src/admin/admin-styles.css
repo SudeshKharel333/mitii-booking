@@ -1,0 +1,126 @@
+:root {
+  --mitii-teal: #2F6F63;
+  --mitii-teal-dark: #1F4D44;
+  --mitii-teal-light: #E8F1EF;
+  --mitii-gold: #C99A3E;
+  --mitii-paper: #FAF9F6;
+  --mitii-ink: #2A2A28;
+  --mitii-ink-soft: #6B6862;
+  --mitii-border: #E2DFD5;
+  --mitii-danger: #B84C4C;
+  --mitii-radius: 10px;
+  --mitii-shadow: 0 1px 3px rgba(42, 42, 40, 0.08), 0 1px 2px rgba(42, 42, 40, 0.04);
+}
+
+.mitii-admin * { box-sizing: border-box; }
+
+.mitii-admin {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--mitii-ink);
+  max-width: 920px;
+}
+
+.mitii-admin h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: var(--mitii-teal-dark);
+}
+
+.mitii-admin h2 {
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mitii-ink-soft);
+  margin: 32px 0 14px;
+}
+
+.mitii-card {
+  background: #fff;
+  border: 1px solid var(--mitii-border);
+  border-radius: var(--mitii-radius);
+  box-shadow: var(--mitii-shadow);
+  padding: 22px;
+  max-width: 440px;
+  margin-bottom: 8px;
+}
+
+.mitii-field { margin-bottom: 16px; }
+
+.mitii-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.mitii-field input[type="text"],
+.mitii-field input[type="email"],
+.mitii-field input[type="number"],
+.mitii-field textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--mitii-border);
+  border-radius: 7px;
+  font-size: 14px;
+  background: var(--mitii-paper);
+}
+
+.mitii-field input:focus,
+.mitii-field textarea:focus {
+  outline: none;
+  border-color: var(--mitii-teal);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--mitii-teal-light);
+}
+
+.mitii-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 18px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mitii-btn-primary { background: var(--mitii-teal); color: #fff; }
+.mitii-btn-primary:hover { background: var(--mitii-teal-dark); }
+
+.mitii-btn-secondary { background: #fff; border-color: var(--mitii-border); color: var(--mitii-ink); }
+.mitii-btn-secondary:hover { background: var(--mitii-paper); }
+
+.mitii-btn-danger { background: #fff; border-color: var(--mitii-danger); color: var(--mitii-danger); }
+.mitii-btn-danger:hover { background: var(--mitii-danger); color: #fff; }
+
+.mitii-btn-sm { padding: 6px 13px; font-size: 13px; }
+.mitii-btn-row { display: flex; gap: 8px; margin-top: 6px; }
+
+.mitii-table-wrap {
+  background: #fff;
+  border-radius: var(--mitii-radius);
+  box-shadow: var(--mitii-shadow);
+  overflow: hidden;
+  max-width: 760px;
+}
+
+.mitii-table { width: 100%; border-collapse: collapse; }
+
+.mitii-table th {
+  background: var(--mitii-teal);
+  color: #fff;
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  padding: 11px 16px;
+}
+
+.mitii-table td {
+  padding: 13px 16px;
+  border-top: 1px solid var(--mitii-border);
+  font-size: 14px;
+}
+
+.mitii-error { color: var(--mitii-danger); font-size: 13px; margin-top: 8px; }
