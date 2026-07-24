@@ -371,3 +371,48 @@
   color: var(--mitii-ink-soft);
 }
 .mitii-portal-switch a { color: var(--mitii-teal); font-weight: 600; }
+/* ---- Staff grid layout (used instead of the single-column option list) ---- */
+.mitii-option-grid {
+  display: grid;
+  grid-template-columns: repeat( 2, 1fr );
+  gap: 10px;
+}
+
+/* ---- Time slot grid (30-minute interval buttons) ---- */
+.mitii-slot-grid {
+  display: grid;
+  grid-template-columns: repeat( 3, 1fr );
+  gap: 8px;
+}
+
+.mitii-slot-button {
+  border: 1.5px solid var(--mitii-border);
+  border-radius: 8px;
+  padding: 10px 6px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mitii-ink);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.mitii-slot-button:hover {
+  border-color: var(--mitii-teal);
+  background: var(--mitii-teal-light);
+}
+
+.mitii-slot-button.is-selected {
+  background: var(--mitii-teal);
+  border-color: var(--mitii-teal);
+  color: #fff;
+}
+
+.mitii-slot-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--mitii-ink-soft);
+  font-size: 13px;
+  padding: 10px 0;
+}

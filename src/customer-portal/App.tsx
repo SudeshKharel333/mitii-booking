@@ -4,7 +4,6 @@ import RegisterForm from './RegisterForm';
 import BookingsList from './BookingsList';
 // @ts-ignore: side-effect import for stylesheet without type declarations
 import './portal-styles.css';
-
 type CurrentUser = {
     logged_in: boolean;
     id?: number;
