@@ -86,15 +86,16 @@ export default function App() {
                         />
                     ) }
 
-                    { step === 2 && (
-                        <SelectStaff
-                            onSelect={ ( staff ) => {
-                                setBooking( { ...booking, staff } );
-                                goNext();
-                            } }
-                            onBack={ goBack }
-                        />
-                    ) }
+                    { step === 2 && booking.service && (
+    <SelectStaff
+        serviceId={ booking.service.id }
+        onSelect={ ( staff ) => {
+            setBooking( { ...booking, staff } );
+            goNext();
+        } }
+        onBack={ goBack }
+    />
+) }
 
                     { step === 3 && (
                         <SelectDateTime
