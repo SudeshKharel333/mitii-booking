@@ -20,13 +20,11 @@ export default function LoginForm( { onSuccess, onSwitchToRegister }: Props ) {
         setSubmitting( true );
 
         fetch( '/wp-json/mitii/v1/customer/login', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-WP-Nonce': ( window as any ).mitiiPortalData?.nonce,
-    },
-    body: JSON.stringify( { email, password } ),
-} )
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( { email, password } ),
+        } )
             .then( ( res ) => res.json() )
             .then( ( data ) => {
                 setSubmitting( false );
@@ -43,19 +41,25 @@ export default function LoginForm( { onSuccess, onSwitchToRegister }: Props ) {
     };
 
     return (
-        <div style={ { maxWidth: '360px' } }>
-            <h2>Log In</h2>
-            <div>
-                <label>Email: <input type="email" value={ email } onChange={ ( e ) => setEmail( e.target.value ) } /></label>
+        <div className="mitii-portal-auth-card">
+            <h2 className="mitii-portal-auth-title">Log In</h2>
+
+            <div className="mitii-portal-field">
+                <label>Email</label>
+                <input type="email" value={ email } onChange={ ( e ) => setEmail( e.target.value ) } />
             </div>
-            <div style={ { marginTop: '8px' } }>
-                <label>Password: <input type="password" value={ password } onChange={ ( e ) => setPassword( e.target.value ) } /></label>
+            <div className="mitii-portal-field">
+                <label>Password</label>
+                <input type="password" value={ password } onChange={ ( e ) => setPassword( e.target.value ) } />
             </div>
-            { error && <p style={ { color: 'red' } }>{ error }</p> }
-            <button style={ { marginTop: '10px' } } onClick={ handleSubmit } disabled={ submitting }>
+
+            { error && <p className="mitii-portal-error">{ error }</p> }
+
+            <button className="mitii-portal-btn-primary" onClick={ handleSubmit } disabled={ submitting }>
                 { submitting ? 'Logging in...' : 'Log In' }
             </button>
-            <p style={ { marginTop: '12px' } }>
+
+            <p className="mitii-portal-switch">
                 Don't have an account?{ ' ' }
                 <a href="#" onClick={ ( e ) => { e.preventDefault(); onSwitchToRegister(); } }>Register here</a>
             </p>

@@ -36,6 +36,9 @@ export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Pr
     const [ error, setError ] = useState( '' );
     const [ submitting, setSubmitting ] = useState( false );
     const [ submitted, setSubmitted ] = useState( false );
+    const [ redirectSeconds, setRedirectSeconds ] = useState( 3 );
+
+    const portalUrl = ( window as any ).mitiiWidgetData?.portalUrl || '/';
 
     const checkAuth = () => {
         fetch( '/wp-json/mitii/v1/customer/me', { credentials: 'same-origin' } )
@@ -52,6 +55,20 @@ export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Pr
     useEffect( () => {
         checkAuth();
     }, [] );
+
+    useEffect( () => {
+        if ( ! submitted || mode !== 'authenticated' ) {
+            return;
+        }
+
+        if ( redirectSeconds <= 0 ) {
+            window.location.href = portalUrl;
+            return;
+        }
+
+        const timer = setTimeout( () => setRedirectSeconds( ( s ) => s - 1 ), 1000 );
+        return () => clearTimeout( timer );
+    }, [ submitted, mode, redirectSeconds ] );
 
     const handleLogin = () => {
         if ( ! loginEmail || ! loginPassword ) {
@@ -164,8 +181,13 @@ export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Pr
                 <p className="mitii-success-title">Booking confirmed!</p>
                 <p className="mitii-success-subtitle">
                     We'll see you on { booking.date } at { booking.time }.
-                    { mode === 'authenticated' && ' You can view this booking anytime in your account.' }
                 </p>
+                { mode === 'authenticated' && (
+                    <p style={ { fontSize: '13px', color: '#6B6862', marginTop: '14px' } }>
+                        Taking you to your bookings in { redirectSeconds }...{ ' ' }
+                        <a href={ portalUrl }>Go now</a>
+                    </p>
+                ) }
             </div>
         );
     }

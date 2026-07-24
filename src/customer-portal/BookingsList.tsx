@@ -69,95 +69,60 @@ export default function BookingsList( { onChanged }: Props ) {
 
     return (
         <div>
-            <div style={ { display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' } }>
-                <div style={ statCardStyle }>
-                    <div style={ statLabelStyle }>Total Spent</div>
-                    <div style={ statValueStyle }>${ totalSpent.toFixed( 2 ) }</div>
+            <div className="mitii-stat-grid">
+                <div className="mitii-stat-card">
+                    <div className="mitii-stat-icon is-gold">$</div>
+                    <div className="mitii-stat-value">${ totalSpent.toFixed( 2 ) }</div>
+                    <div className="mitii-stat-label">Total Spent</div>
                 </div>
-                <div style={ statCardStyle }>
-                    <div style={ statLabelStyle }>Next Appointment</div>
-                    <div style={ statValueStyle }>
-                        { nextBooking
-                            ? `${ nextBooking.booking_date } at ${ nextBooking.booking_time }`
-                            : 'None scheduled' }
+
+                <div className="mitii-stat-card">
+                    <div className="mitii-stat-icon">◷</div>
+                    <div className="mitii-stat-value">
+                        { nextBooking ? nextBooking.booking_date : '—' }
                     </div>
-                    { nextBooking?.service_name && (
-                        <div style={ { fontSize: '13px', color: '#6B6862', marginTop: '2px' } }>
-                            { nextBooking.service_name }
+                    <div className="mitii-stat-label">Next Appointment</div>
+                    { nextBooking && (
+                        <div className="mitii-stat-sub">
+                            { nextBooking.booking_time }{ nextBooking.service_name ? ` · ${ nextBooking.service_name }` : '' }
                         </div>
                     ) }
                 </div>
             </div>
 
-            <h3>Your Bookings</h3>
+            <p className="mitii-portal-section-title">
+                { bookings.length } Total Booking{ bookings.length !== 1 ? 's' : '' }
+            </p>
 
-            { bookings.length === 0 && <p>You have no bookings yet.</p> }
+            { bookings.length === 0 && (
+                <div className="mitii-portal-empty">You have no bookings yet.</div>
+            ) }
 
             { bookings.map( ( b ) => (
-                <div key={ b.id } style={ { border: '1px solid #E2DFD5', borderRadius: '10px', padding: '14px 16px', marginBottom: '10px' } }>
-                    <div style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' } }>
+                <div key={ b.id } className="mitii-booking-card">
+                    <div className="mitii-booking-top">
                         <div>
-                            <div style={ { fontWeight: 600 } }>{ b.service_name || 'Service unavailable' }</div>
-                            <div style={ { fontSize: '13px', color: '#6B6862', marginTop: '2px' } }>
+                            <div className="mitii-booking-service">{ b.service_name || 'Service unavailable' }</div>
+                            <div className="mitii-booking-meta">
                                 { b.booking_date } at { b.booking_time }
                                 { b.staff_name && ` · with ${ b.staff_name }` }
                             </div>
                             { b.service_price && (
-                                <div style={ { fontSize: '13px', marginTop: '4px' } }>${ b.service_price }</div>
+                                <div className="mitii-booking-price">${ b.service_price }</div>
                             ) }
                         </div>
-                        <span style={ statusBadgeStyle( b.status ) }>{ b.status }</span>
+                        <span className={ `mitii-chip mitii-chip-${ b.status }` }>{ b.status }</span>
                     </div>
 
                     { b.status !== 'cancelled' && (
-                        <button style={ { marginTop: '10px' } } onClick={ () => handleCancel( b.id ) }>
-                            Cancel this booking
-                        </button>
+                        <div>
+                            <button className="mitii-portal-btn-text" onClick={ () => handleCancel( b.id ) }>
+                                Cancel this booking
+                            </button>
+                        </div>
                     ) }
                 </div>
             ) ) }
         </div>
     );
-}
-
-const statCardStyle: React.CSSProperties = {
-    background: '#FAF9F6',
-    border: '1px solid #E2DFD5',
-    borderRadius: '10px',
-    padding: '14px 18px',
-    flex: '1',
-    minWidth: '160px',
-};
-
-const statLabelStyle: React.CSSProperties = {
-    fontSize: '12px',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    color: '#6B6862',
-    marginBottom: '4px',
-};
-
-const statValueStyle: React.CSSProperties = {
-    fontSize: '20px',
-    fontWeight: 700,
-    color: '#1F4D44',
-};
-
-function statusBadgeStyle( status: string ): React.CSSProperties {
-    const colors: Record<string, { bg: string; fg: string }> = {
-        pending: { bg: '#FBF0DA', fg: '#96721F' },
-        confirmed: { bg: '#E8F1EF', fg: '#1F4D44' },
-        cancelled: { bg: '#F7E7E7', fg: '#B84C4C' },
-    };
-    const c = colors[ status ] || colors.pending;
-    return {
-        display: 'inline-block',
-        padding: '3px 10px',
-        borderRadius: '999px',
-        fontSize: '12px',
-        fontWeight: 700,
-        textTransform: 'capitalize',
-        background: c.bg,
-        color: c.fg,
-    };
 }
