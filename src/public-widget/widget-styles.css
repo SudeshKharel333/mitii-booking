@@ -118,10 +118,10 @@
 }
 
 /* ---- Selectable option cards (services / staff) ---- */
-.mitii-option-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.mitii-option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
 }
 
 .mitii-option-card {
@@ -131,6 +131,9 @@
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.05s ease;
   background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .mitii-option-card:hover {
@@ -156,15 +159,15 @@
 
 .mitii-option-price {
   display: inline-block;
+  align-self: flex-start;
   background: var(--mitii-gold-light);
   color: #8a6a1f;
   font-weight: 700;
   font-size: 12px;
   padding: 2px 9px;
   border-radius: 999px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
-
 /* ---- Form fields ---- */
 .mitii-widget-field { margin-bottom: 16px; }
 

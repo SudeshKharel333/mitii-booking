@@ -237,3 +237,30 @@
   color: var(--mitii-ink-soft);
 }
 .mitii-portal-switch a { color: var(--mitii-teal); font-weight: 600; }
+/* ---- Logged-out shell (wraps Login/Register so it matches the logged-in card frame) ---- */
+.mitii-portal-auth-shell {
+  background: var(--mitii-paper);
+  border-radius: 20px;
+  box-shadow: var(--elevation-2);
+  padding: 40px 24px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.mitii-portal-auth-brand {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.mitii-portal-auth-brand-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--mitii-teal-dark);
+  margin: 0 0 4px;
+}
+
+.mitii-portal-auth-brand-subtitle {
+  font-size: 13px;
+  color: var(--mitii-ink-soft);
+  margin: 0;
+}
