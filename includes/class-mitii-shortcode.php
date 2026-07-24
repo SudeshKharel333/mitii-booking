@@ -35,5 +35,31 @@ class Mitii_Shortcode {
             $asset_file['version']
         );
     }
+            wp_localize_script( 'mitii-public-widget', 'mitiiWidgetData', array(
+            'portalUrl' => self::find_portal_page_url(),
+        ) );
+
 }
+
+private static function find_portal_page_url() {
+        $pages = get_posts( array(
+            'post_type'   => 'page',
+            'post_status' => 'publish',
+            'numberposts' => -1,
+        ) );
+ 
+        foreach ( $pages as $page ) {
+            if ( has_shortcode( $page->post_content, 'mitii_customer_portal' ) ) {
+                return get_permalink( $page->ID );
+            }
+        }
+ 
+        return home_url( '/' );
+    }
+
+
+
+
+
+
 }
