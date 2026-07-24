@@ -25,15 +25,17 @@ export default function SelectService( { onSelect }: Props ) {
     }
 
     return (
-        <div className="mitii-option-list">
+        <div className="mitii-option-grid">
             { services.map( ( service ) => (
                 <div
                     key={ service.id }
                     className="mitii-option-card"
                     onClick={ () => onSelect( service ) }
                 >
-                    <div className="mitii-option-name">{ service.name }</div>
-                    <div className="mitii-option-meta">{ service.duration_minutes } minutes</div>
+                    <div className="mitii-option-info">
+                        <div className="mitii-option-name">{ service.name }</div>
+                        <div className="mitii-option-meta">{ service.duration_minutes } minutes</div>
+                    </div>
                     <span className="mitii-option-price">${ service.price }</span>
                 </div>
             ) ) }
