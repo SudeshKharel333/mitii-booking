@@ -27,6 +27,12 @@ class Mitii_Staff_Controller {
             'callback'            => array( __CLASS__, 'delete_staff' ),
             'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
         ) );
+
+        register_rest_route( 'mitii/v1', '/services/(?P<service_id>\d+)/staff', array(
+            'methods'             => 'GET',
+            'callback'            => array( __CLASS__, 'get_staff_by_service' ),
+            'permission_callback' => '__return_true',
+        ) );
     }
 
     public static function check_admin_permission() {
@@ -64,6 +70,31 @@ class Mitii_Staff_Controller {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_staff';
         $results = $wpdb->get_results( "SELECT * FROM $table ORDER BY id ASC" );
+
+        foreach ( $results as $staff ) {
+            $staff->service_ids = self::get_service_ids_for_staff( $staff->id );
+        }
+
+        return rest_ensure_response( $results );
+    }
+
+    public static function get_staff_by_service( $request ) {
+        global $wpdb;
+        $staff_table    = $wpdb->prefix . 'mitii_staff';
+        $junction_table = $wpdb->prefix . 'mitii_staff_services';
+
+        $service_id = intval( $request['service_id'] );
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT s.*
+                 FROM $staff_table s
+                 INNER JOIN $junction_table js ON js.staff_id = s.id
+                 WHERE js.service_id = %d
+                 ORDER BY s.name ASC",
+                $service_id
+            )
+        );
 
         foreach ( $results as $staff ) {
             $staff->service_ids = self::get_service_ids_for_staff( $staff->id );
