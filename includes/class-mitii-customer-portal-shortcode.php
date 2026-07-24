@@ -26,9 +26,15 @@ class Mitii_Customer_Portal_Shortcode {
             true
         );
 
-wp_localize_script( 'mitii-customer-portal', 'mitiiPortalData', array(
-        'nonce' => wp_create_nonce( 'wp_rest' ),
-    ) );
+  $css_path = MITII_PLUGIN_DIR . 'build/customer-portal.css';
+        if ( file_exists( $css_path ) ) {
+            wp_enqueue_style(
+                'mitii-customer-portal-style',
+                MITII_PLUGIN_URL . 'build/customer-portal.css',
+                array(),
+                $asset_file['version']
+            );
+        }
 
 
 
