@@ -12,15 +12,6 @@ type CurrentUser = {
     email?: string;
 };
 
-function getInitials( name: string ) {
-    return name
-        .split( ' ' )
-        .map( ( part ) => part[ 0 ] )
-        .join( '' )
-        .toUpperCase()
-        .slice( 0, 2 );
-}
-
 export default function App() {
     const [ user, setUser ] = useState<CurrentUser | null>( null );
     const [ mode, setMode ] = useState<'login' | 'register'>( 'login' );
@@ -52,39 +43,73 @@ export default function App() {
     };
 
     if ( loading ) {
-        return <div className="mitii-portal"><div className="mitii-portal-body">Loading...</div></div>;
+        return (
+            <div className="mitii-portal-ticket">
+                <div className="mitii-portal-ticket-header">
+                    <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
+                    <h2 className="mitii-portal-ticket-title">Your Account</h2>
+                </div>
+                <div className="mitii-portal-ticket-body">Loading...</div>
+            </div>
+        );
     }
 
     if ( loadError ) {
-        return <div className="mitii-portal"><div className="mitii-portal-body">{ loadError }</div></div>;
+        return (
+            <div className="mitii-portal-ticket">
+                <div className="mitii-portal-ticket-header">
+                    <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
+                    <h2 className="mitii-portal-ticket-title">Your Account</h2>
+                </div>
+                <div className="mitii-portal-ticket-body">{ loadError }</div>
+            </div>
+        );
     }
 
     if ( ! user?.logged_in ) {
         return (
-            <div style={ { padding: '20px 0' } }>
-                { mode === 'login' ? (
-                    <LoginForm onSuccess={ checkLoginStatus } onSwitchToRegister={ () => setMode( 'register' ) } />
-                ) : (
-                    <RegisterForm onSuccess={ checkLoginStatus } onSwitchToLogin={ () => setMode( 'login' ) } />
-                ) }
+            <div className="mitii-portal-ticket">
+                <div className="mitii-portal-ticket-header">
+                    <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
+                    <h2 className="mitii-portal-ticket-title">
+                        { mode === 'login' ? 'Log In' : 'Create Account' }
+                    </h2>
+                </div>
+                <div className="mitii-portal-ticket-body">
+                    { mode === 'login' ? (
+                        <LoginForm onSuccess={ checkLoginStatus } onSwitchToRegister={ () => setMode( 'register' ) } />
+                    ) : (
+                        <RegisterForm onSuccess={ checkLoginStatus } onSwitchToLogin={ () => setMode( 'login' ) } />
+                    ) }
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="mitii-portal">
-            <div className="mitii-portal-appbar">
-                <div className="mitii-portal-identity">
-                    <div className="mitii-portal-avatar">{ getInitials( user.name || '?' ) }</div>
-                    <div>
-                        <p className="mitii-portal-name">{ user.name }</p>
-                        <p className="mitii-portal-email">{ user.email }</p>
-                    </div>
+        <div className="mitii-portal-ticket" style={ { maxWidth: '640px' } }>
+            <div className="mitii-portal-ticket-header" style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' } }>
+                <div>
+                    <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
+                    <h2 className="mitii-portal-ticket-title">{ user.name }</h2>
                 </div>
-                <button className="mitii-portal-logout" onClick={ handleLogout }>Log out</button>
+                <button
+                    onClick={ handleLogout }
+                    style={ {
+                        background: 'rgba(255,255,255,0.15)',
+                        border: 'none',
+                        color: '#fff',
+                        padding: '7px 16px',
+                        borderRadius: '20px',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                    } }
+                >
+                    Log out
+                </button>
             </div>
-
-            <div className="mitii-portal-body">
+            <div className="mitii-portal-ticket-body">
                 <BookingsList onChanged={ checkLoginStatus } />
             </div>
         </div>
