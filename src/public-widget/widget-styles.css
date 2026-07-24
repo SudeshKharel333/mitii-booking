@@ -301,3 +301,70 @@
   color: var(--mitii-ink-soft);
   margin: 0;
 }
+/* ---- Shared auth card styles (kept identical to portal-styles.css so the
+   inline login/register in the booking widget matches the customer portal) ---- */
+.mitii-portal-auth-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 4px 0 0;
+  box-shadow: none;
+  max-width: 100%;
+  margin: 0;
+}
+
+.mitii-portal-auth-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--mitii-teal-dark);
+  margin: 0 0 16px;
+  text-align: left;
+}
+
+.mitii-portal-field { margin-bottom: 14px; }
+.mitii-portal-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.mitii-portal-field input {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1px solid var(--mitii-border);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--mitii-paper);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.mitii-portal-field input:focus {
+  outline: none;
+  border-color: var(--mitii-teal);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--mitii-teal-light);
+}
+
+.mitii-portal-btn-primary {
+  width: 100%;
+  background: var(--mitii-teal);
+  color: #fff;
+  border: none;
+  padding: 11px 20px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+.mitii-portal-btn-primary:hover { background: var(--mitii-teal-dark); }
+.mitii-portal-btn-primary:active { transform: scale(0.98); }
+.mitii-portal-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.mitii-portal-error { color: var(--mitii-danger); font-size: 13px; margin: -4px 0 12px; }
+
+.mitii-portal-switch {
+  text-align: center;
+  font-size: 13px;
+  margin-top: 16px;
+  color: var(--mitii-ink-soft);
+}
+.mitii-portal-switch a { color: var(--mitii-teal); font-weight: 600; }

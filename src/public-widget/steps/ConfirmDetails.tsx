@@ -232,25 +232,25 @@ export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Pr
             ) }
 
             { mode === 'login' && (
-                <div>
-                    <div className="mitii-widget-field">
+                <div className="mitii-portal-auth-card">
+                    <h3 className="mitii-portal-auth-title">Log In to Book</h3>
+
+                    <div className="mitii-portal-field">
                         <label>Email</label>
                         <input type="email" value={ loginEmail } onChange={ ( e ) => setLoginEmail( e.target.value ) } />
                     </div>
-                    <div className="mitii-widget-field">
+                    <div className="mitii-portal-field">
                         <label>Password</label>
                         <input type="password" value={ loginPassword } onChange={ ( e ) => setLoginPassword( e.target.value ) } />
                     </div>
 
-                    { error && <p className="mitii-widget-error">{ error }</p> }
+                    { error && <p className="mitii-portal-error">{ error }</p> }
 
-                    <div className="mitii-widget-btn-row">
-                        <button className="mitii-widget-btn mitii-widget-btn-primary" onClick={ handleLogin } disabled={ submitting }>
-                            { submitting ? 'Logging in...' : 'Log In & Confirm' }
-                        </button>
-                    </div>
+                    <button className="mitii-portal-btn-primary" onClick={ handleLogin } disabled={ submitting }>
+                        { submitting ? 'Logging in...' : 'Log In & Confirm' }
+                    </button>
 
-                    <p style={ { fontSize: '13px', textAlign: 'center', margin: '14px 0 0' } }>
+                    <p className="mitii-portal-switch">
                         <a href="#" onClick={ ( e ) => { e.preventDefault(); setError( '' ); setMode( 'register' ); } }>
                             Create an account
                         </a>
@@ -263,29 +263,29 @@ export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Pr
             ) }
 
             { mode === 'register' && (
-                <div>
-                    <div className="mitii-widget-field">
+                <div className="mitii-portal-auth-card">
+                    <h3 className="mitii-portal-auth-title">Create an Account</h3>
+
+                    <div className="mitii-portal-field">
                         <label>Name</label>
                         <input type="text" value={ regName } onChange={ ( e ) => setRegName( e.target.value ) } />
                     </div>
-                    <div className="mitii-widget-field">
+                    <div className="mitii-portal-field">
                         <label>Email</label>
                         <input type="email" value={ regEmail } onChange={ ( e ) => setRegEmail( e.target.value ) } />
                     </div>
-                    <div className="mitii-widget-field">
+                    <div className="mitii-portal-field">
                         <label>Password</label>
                         <input type="password" value={ regPassword } onChange={ ( e ) => setRegPassword( e.target.value ) } />
                     </div>
 
-                    { error && <p className="mitii-widget-error">{ error }</p> }
+                    { error && <p className="mitii-portal-error">{ error }</p> }
 
-                    <div className="mitii-widget-btn-row">
-                        <button className="mitii-widget-btn mitii-widget-btn-primary" onClick={ handleRegister } disabled={ submitting }>
-                            { submitting ? 'Creating account...' : 'Create Account & Confirm' }
-                        </button>
-                    </div>
+                    <button className="mitii-portal-btn-primary" onClick={ handleRegister } disabled={ submitting }>
+                        { submitting ? 'Creating account...' : 'Create Account & Confirm' }
+                    </button>
 
-                    <p style={ { fontSize: '13px', textAlign: 'center', margin: '14px 0 0' } }>
+                    <p className="mitii-portal-switch">
                         <a href="#" onClick={ ( e ) => { e.preventDefault(); setError( '' ); setMode( 'login' ); } }>
                             Already have an account? Log in
                         </a>
@@ -316,7 +316,7 @@ export default function ConfirmDetails( { booking, onSubmitDetails, onBack }: Pr
                         </button>
                     </div>
 
-                    <p style={ { fontSize: '13px', textAlign: 'center', margin: '14px 0 0' } }>
+                    <p className="mitii-portal-switch">
                         <a href="#" onClick={ ( e ) => { e.preventDefault(); setError( '' ); setMode( 'login' ); } }>
                             Have an account? Log in instead
                         </a>
