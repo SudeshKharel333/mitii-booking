@@ -27,6 +27,15 @@ class Mitii_Services_Controller {
             'callback'            => array( __CLASS__, 'delete_service' ),
             'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
         ) );
+
+
+register_rest_route( 'mitii/v1', '/staff/(?P<staff_id>\d+)/services', array(
+            'methods'             => 'GET',
+            'callback'            => array( __CLASS__, 'get_services_by_staff' ),
+            'permission_callback' => '__return_true',
+        ) );
+
+
     }
 
     public static function check_admin_permission() {
@@ -65,6 +74,30 @@ class Mitii_Services_Controller {
             'price'             => $price,
         ) );
     }
+
+
+  public static function get_services_by_staff( $request ) {
+        global $wpdb;
+        $services_table = $wpdb->prefix . 'mitii_services';
+        $junction_table = $wpdb->prefix . 'mitii_staff_services';
+ 
+        $staff_id = intval( $request['staff_id'] );
+ 
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT s.*
+                 FROM $services_table s
+                 INNER JOIN $junction_table js ON js.service_id = s.id
+                 WHERE js.staff_id = %d
+                 ORDER BY s.name ASC",
+                $staff_id
+            )
+        );
+ 
+        return rest_ensure_response( $results );
+    }
+
+
 
     public static function update_service( $request ) {
         global $wpdb;
