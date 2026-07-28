@@ -66,6 +66,12 @@ class Mitii_Admin_Menu {
 
         list( $handle, $root_id ) = $script_map[ $hook ];
 
+        // Services and Staff pages both need WordPress's built-in Media
+        // Library picker, for service/staff images.
+        if ( 'admin-services' === $handle || 'admin-staff' === $handle ) {
+            wp_enqueue_media();
+        }
+
         $asset_file = include MITII_PLUGIN_DIR . "build/{$handle}.asset.php";
 
         wp_enqueue_script(
