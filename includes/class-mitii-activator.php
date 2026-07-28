@@ -15,6 +15,7 @@ class Mitii_Activator {
             name VARCHAR(255) NOT NULL,
             duration_minutes INT NOT NULL DEFAULT 30,
             price DECIMAL(10,2) NOT NULL DEFAULT 0,
+            image_url VARCHAR(500) DEFAULT '',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
         ) $charset_collate;";
@@ -27,6 +28,7 @@ class Mitii_Activator {
             name VARCHAR(255) NOT NULL,
             email VARCHAR(255) DEFAULT '',
             bio TEXT,
+            image_url VARCHAR(500) DEFAULT '',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
         ) $charset_collate;";
