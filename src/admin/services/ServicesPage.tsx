@@ -7,7 +7,15 @@ type Service = {
     name: string;
     duration_minutes: number;
     price: string;
+    image_url: string;
 };
+
+// Minimal shape of the parts of window.wp.media we actually use.
+declare global {
+    interface Window {
+        wp: any;
+    }
+}
 
 export default function ServicesPage() {
     const [ services, setServices ] = useState<Service[]>( [] );
@@ -17,6 +25,7 @@ export default function ServicesPage() {
     const [ name, setName ] = useState( '' );
     const [ duration, setDuration ] = useState( '30' );
     const [ price, setPrice ] = useState( '' );
+    const [ imageUrl, setImageUrl ] = useState( '' );
     const [ error, setError ] = useState( '' );
 
     const loadServices = () => {
@@ -38,6 +47,7 @@ export default function ServicesPage() {
         setName( '' );
         setDuration( '30' );
         setPrice( '' );
+        setImageUrl( '' );
         setError( '' );
     };
 
@@ -46,6 +56,27 @@ export default function ServicesPage() {
         setName( service.name );
         setDuration( String( service.duration_minutes ) );
         setPrice( String( service.price ) );
+        setImageUrl( service.image_url || '' );
+    };
+
+    const openMediaPicker = () => {
+        if ( ! window.wp || ! window.wp.media ) {
+            setError( 'Media library failed to load. Please refresh the page.' );
+            return;
+        }
+
+        const frame = window.wp.media( {
+            title: 'Select or Upload Service Image',
+            button: { text: 'Use this image' },
+            multiple: false,
+        } );
+
+        frame.on( 'select', () => {
+            const attachment = frame.state().get( 'selection' ).first().toJSON();
+            setImageUrl( attachment.url );
+        } );
+
+        frame.open();
     };
 
     const handleSubmit = () => {
@@ -59,6 +90,7 @@ export default function ServicesPage() {
             name,
             duration_minutes: Number( duration ),
             price: Number( price ),
+            image_url: imageUrl,
         };
 
         const isEditing = editingId !== null;
@@ -124,6 +156,27 @@ export default function ServicesPage() {
                     <input type="number" step="0.01" value={ price } onChange={ ( e ) => setPrice( e.target.value ) } />
                 </div>
 
+                <div className="mitii-field">
+                    <label>Service Image</label>
+                    { imageUrl && (
+                        <img
+                            src={ imageUrl }
+                            alt="Service preview"
+                            style={ { width: '100%', maxWidth: '200px', borderRadius: '8px', marginBottom: '8px', display: 'block' } }
+                        />
+                    ) }
+                    <div className="mitii-btn-row">
+                        <button type="button" className="mitii-btn mitii-btn-secondary" onClick={ openMediaPicker }>
+                            { imageUrl ? 'Change Image' : 'Choose Image' }
+                        </button>
+                        { imageUrl && (
+                            <button type="button" className="mitii-btn mitii-btn-secondary" onClick={ () => setImageUrl( '' ) }>
+                                Remove Image
+                            </button>
+                        ) }
+                    </div>
+                </div>
+
                 { error && <p className="mitii-error">{ error }</p> }
 
                 <div className="mitii-btn-row">
@@ -146,6 +199,7 @@ export default function ServicesPage() {
                     <table className="mitii-table">
                         <thead>
                             <tr>
+                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Duration</th>
                                 <th>Price</th>
@@ -155,6 +209,17 @@ export default function ServicesPage() {
                         <tbody>
                             { services.map( ( s ) => (
                                 <tr key={ s.id }>
+                                    <td>
+                                        { s.image_url ? (
+                                            <img
+                                                src={ s.image_url }
+                                                alt={ s.name }
+                                                style={ { width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px' } }
+                                            />
+                                        ) : (
+                                            <span style={ { color: '#999', fontSize: '12px' } }>No image</span>
+                                        ) }
+                                    </td>
                                     <td>{ s.name }</td>
                                     <td>{ s.duration_minutes } min</td>
                                     <td>${ s.price }</td>
