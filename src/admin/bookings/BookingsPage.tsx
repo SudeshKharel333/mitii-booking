@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import '../admin-styles.css';
 
 type Booking = {
     id: number;
