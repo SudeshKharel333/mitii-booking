@@ -32,6 +32,19 @@ export default function SelectService( { onSelect }: Props ) {
                     className="mitii-option-card"
                     onClick={ () => onSelect( service ) }
                 >
+                    { service.image_url && (
+                        <img
+                            src={ service.image_url }
+                            alt={ service.name }
+                            style={ {
+                                width: '100%',
+                                height: '90px',
+                                objectFit: 'cover',
+                                borderRadius: '8px',
+                                marginBottom: '8px',
+                            } }
+                        />
+                    ) }
                     <div className="mitii-option-info">
                         <div className="mitii-option-name">{ service.name }</div>
                         <div className="mitii-option-meta">{ service.duration_minutes } minutes</div>
