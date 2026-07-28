@@ -110,6 +110,7 @@ class Mitii_Staff_Controller {
         $name        = sanitize_text_field( $request['name'] );
         $email       = sanitize_email( $request['email'] );
         $bio         = sanitize_textarea_field( $request['bio'] );
+        $image_url   = isset( $request['image_url'] ) ? esc_url_raw( $request['image_url'] ) : '';
         $service_ids = isset( $request['service_ids'] ) ? (array) $request['service_ids'] : array();
 
         if ( empty( $name ) ) {
@@ -117,9 +118,10 @@ class Mitii_Staff_Controller {
         }
 
         $wpdb->insert( $table, array(
-            'name'  => $name,
-            'email' => $email,
-            'bio'   => $bio,
+            'name'      => $name,
+            'email'     => $email,
+            'bio'       => $bio,
+            'image_url' => $image_url,
         ) );
 
         $staff_id = $wpdb->insert_id;
@@ -130,6 +132,7 @@ class Mitii_Staff_Controller {
             'name'         => $name,
             'email'        => $email,
             'bio'          => $bio,
+            'image_url'    => $image_url,
             'service_ids'  => array_map( 'intval', $service_ids ),
         ) );
     }
@@ -142,6 +145,7 @@ class Mitii_Staff_Controller {
         $name        = sanitize_text_field( $request['name'] );
         $email       = sanitize_email( $request['email'] );
         $bio         = sanitize_textarea_field( $request['bio'] );
+        $image_url   = isset( $request['image_url'] ) ? esc_url_raw( $request['image_url'] ) : '';
         $service_ids = isset( $request['service_ids'] ) ? (array) $request['service_ids'] : array();
 
         if ( empty( $name ) ) {
@@ -150,7 +154,7 @@ class Mitii_Staff_Controller {
 
         $updated = $wpdb->update(
             $table,
-            array( 'name' => $name, 'email' => $email, 'bio' => $bio ),
+            array( 'name' => $name, 'email' => $email, 'bio' => $bio, 'image_url' => $image_url ),
             array( 'id' => $id )
         );
 
