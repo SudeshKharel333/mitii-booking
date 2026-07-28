@@ -19,6 +19,7 @@ export type Staff = {
     name: string;
     email: string;
     bio: string;
+    image_url: string;
 };
 
 export type BookingData = {
