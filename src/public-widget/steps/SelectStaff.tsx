@@ -39,6 +39,19 @@ export default function SelectStaff( { serviceId, onSelect, onBack }: Props ) {
                             className="mitii-option-card"
                             onClick={ () => onSelect( staff ) }
                         >
+                            { staff.image_url && (
+                                <img
+                                    src={ staff.image_url }
+                                    alt={ staff.name }
+                                    style={ {
+                                        width: '56px',
+                                        height: '56px',
+                                        objectFit: 'cover',
+                                        borderRadius: '50%',
+                                        marginBottom: '8px',
+                                    } }
+                                />
+                            ) }
                             <div className="mitii-option-name">{ staff.name }</div>
                             { staff.bio && <div className="mitii-option-meta">{ staff.bio }</div> }
                         </div>
