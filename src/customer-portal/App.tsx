@@ -93,20 +93,21 @@ export default function App() {
                     <h2 className="mitii-portal-ticket-title">{ user.name }</h2>
                 </div>
                 <button
-                    onClick={ handleLogout }
-                    style={ {
-                        background: 'rgba(255,255,255,0.15)',
-                        border: 'none',
-                        color: '#fff',
-                        padding: '7px 16px',
-                        borderRadius: '20px',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                    } }
-                >
-                    Log out
-                </button>
+    onClick={ handleLogout }
+    style={ {
+        background: '#e53e3e', // Bright red background to test visibility
+        color: '#ffffff',
+        border: 'none',
+        padding: '8px 16px',
+        borderRadius: '20px',
+        fontSize: '13px',
+        fontWeight: 600,
+        cursor: 'pointer',
+        zIndex: 9999,
+    } }
+>
+    Log out
+</button>
             </div>
             <div className="mitii-portal-ticket-body">
                 <BookingsList onChanged={ checkLoginStatus } />
