@@ -53,9 +53,10 @@ register_rest_route( 'mitii/v1', '/staff/(?P<staff_id>\d+)/services', array(
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_services';
 
-        $name     = sanitize_text_field( $request['name'] );
-        $duration = intval( $request['duration_minutes'] );
-        $price    = floatval( $request['price'] );
+        $name      = sanitize_text_field( $request['name'] );
+        $duration  = intval( $request['duration_minutes'] );
+        $price     = floatval( $request['price'] );
+        $image_url = isset( $request['image_url'] ) ? esc_url_raw( $request['image_url'] ) : '';
 
         if ( empty( $name ) ) {
             return new WP_Error( 'missing_name', 'Service name is required', array( 'status' => 400 ) );
@@ -65,6 +66,7 @@ register_rest_route( 'mitii/v1', '/staff/(?P<staff_id>\d+)/services', array(
             'name'             => $name,
             'duration_minutes' => $duration,
             'price'            => $price,
+            'image_url'        => $image_url,
         ) );
 
         return rest_ensure_response( array(
@@ -72,6 +74,7 @@ register_rest_route( 'mitii/v1', '/staff/(?P<staff_id>\d+)/services', array(
             'name'              => $name,
             'duration_minutes'  => $duration,
             'price'             => $price,
+            'image_url'         => $image_url,
         ) );
     }
 
@@ -104,9 +107,10 @@ register_rest_route( 'mitii/v1', '/staff/(?P<staff_id>\d+)/services', array(
         $table = $wpdb->prefix . 'mitii_services';
         $id    = intval( $request['id'] );
 
-        $name     = sanitize_text_field( $request['name'] );
-        $duration = intval( $request['duration_minutes'] );
-        $price    = floatval( $request['price'] );
+        $name      = sanitize_text_field( $request['name'] );
+        $duration  = intval( $request['duration_minutes'] );
+        $price     = floatval( $request['price'] );
+        $image_url = isset( $request['image_url'] ) ? esc_url_raw( $request['image_url'] ) : '';
 
         if ( empty( $name ) ) {
             return new WP_Error( 'missing_name', 'Service name is required', array( 'status' => 400 ) );
@@ -118,6 +122,7 @@ register_rest_route( 'mitii/v1', '/staff/(?P<staff_id>\d+)/services', array(
                 'name'             => $name,
                 'duration_minutes' => $duration,
                 'price'            => $price,
+                'image_url'        => $image_url,
             ),
             array( 'id' => $id )
         );
