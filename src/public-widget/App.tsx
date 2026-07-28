@@ -7,6 +7,7 @@ import ConfirmDetails from './steps/ConfirmDetails';
 import './widget-styles.css';
 
 export type Service = {
+    image_url: import("react").JSX.Element;
     id: number;
     name: string;
     duration_minutes: number;
@@ -18,6 +19,7 @@ export type Staff = {
     name: string;
     email: string;
     bio: string;
+    image_url: string;
 };
 
 export type BookingData = {
