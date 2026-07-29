@@ -7,7 +7,7 @@ import ConfirmDetails from './steps/ConfirmDetails';
 import './widget-styles.css';
 
 export type Service = {
-    image_url: import("react").JSX.Element;
+    image_url: string;
     id: number;
     name: string;
     duration_minutes: number;
