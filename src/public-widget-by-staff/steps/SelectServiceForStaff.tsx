@@ -32,7 +32,7 @@ export default function SelectServiceForStaff( { staffId, onSelect, onBack }: Pr
             ) }
 
             { ! loading && services.length > 0 && (
-                <div className="mitii-option-list">
+                <div className="mitii-option-grid">
                     { services.map( ( service ) => (
                         <div
                             key={ service.id }
