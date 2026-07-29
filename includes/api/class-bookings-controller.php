@@ -4,13 +4,33 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Mitii_Bookings_Controller {
 
     public static function register_routes() {
-        register_rest_route( 'mitii/v1', '/bookings', array(
-            'methods'             => 'GET',
-            'callback'            => array( __CLASS__, 'get_bookings' ),
-            'permission_callback' => function() {
-                return current_user_can( 'manage_options' );
-            },
-        ) );
+       register_rest_route( 'mitii/v1', '/bookings', array(
+        'methods'             => 'GET',
+        'callback'            => array( __CLASS__, 'get_bookings' ),
+        'permission_callback' => function( WP_REST_Request $request ) {
+            // 1. Check capability
+            if ( ! current_user_can( 'manage_options' ) ) {
+                return new WP_Error( 
+                    'rest_forbidden', 
+                    __( 'You do not have permission to view bookings.' ), 
+                    array( 'status' => 403 ) 
+                );
+            }
+
+            // Optional: Standard WP REST automatically checks X-WP-Nonce for cookie auth.
+            // But if you are passing a custom nonce in headers (e.g., 'X-Mitii-Nonce'):
+            $nonce = $request->get_header( 'x_mitii_nonce' );
+            if ( $nonce && ! wp_verify_nonce( $nonce, 'mitii_bookings_nonce' ) ) {
+                return new WP_Error( 
+                    'rest_invalid_nonce', 
+                    __( 'Invalid security token.' ), 
+                    array( 'status' => 403 ) 
+                );
+            }
+
+            return true;
+        },
+    ) );
 
         register_rest_route( 'mitii/v1', '/bookings', array(
             'methods'             => 'POST',

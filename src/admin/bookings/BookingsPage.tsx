@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-
 type Booking = {
     id: number;
     service_id: number;
@@ -11,13 +10,24 @@ type Booking = {
     status: string;
 };
 
+declare const mitiiAdminData: {
+    nonce: string;
+};
+
 export default function BookingsPage() {
     const [ bookings, setBookings ] = useState<Booking[]>( [] );
     const [ loading, setLoading ] = useState( true );
 
     const loadBookings = () => {
         setLoading( true );
-        fetch( '/wp-json/mitii/v1/bookings' )
+        fetch( '/wp-json/mitii/v1/bookings', {
+    method: 'GET',
+    headers: {
+        'X-WP-Nonce': mitiiAdminData.nonce, // Crucial for cookie authentication
+        'Content-Type': 'application/json'
+    }
+} )
+        
             .then( ( res ) => res.json() )
             .then( ( data ) => {
                 setBookings( data );
