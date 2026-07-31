@@ -79,6 +79,10 @@ class Mitii_Bookings_Controller {
             return new WP_Error( 'invalid_email', 'Please enter a valid email address', array( 'status' => 400 ) );
         }
 
+        if ( ! Mitii_Availability_Controller::is_slot_available( $staff_id, $booking_date, $service_id, $booking_time ) ) {
+            return new WP_Error( 'slot_unavailable', 'That time is no longer available. Please choose another slot.', array( 'status' => 409 ) );
+        }
+
         $wpdb->insert( $table, array(
             'service_id'      => $service_id,
             'staff_id'        => $staff_id,

@@ -1,13 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Props = {
+    staffId: number;
+    serviceId: number;
     onSelect: ( date: string, time: string ) => void;
     onBack: () => void;
 };
-
-const START_HOUR = 9;  // 9:00 AM
-const END_HOUR = 18;   // last slot starts before 6:00 PM
-const SLOT_MINUTES = 30;
 
 /** Returns today's date as 'YYYY-MM-DD', in the visitor's local timezone. */
 function getTodayString() {
@@ -18,44 +16,38 @@ function getTodayString() {
     return `${ year }-${ month }-${ day }`;
 }
 
-/** Returns the current time as 'HH:MM', in the visitor's local timezone. */
-function getCurrentTimeString() {
-    const now = new Date();
-    const hours = String( now.getHours() ).padStart( 2, '0' );
-    const minutes = String( now.getMinutes() ).padStart( 2, '0' );
-    return `${ hours }:${ minutes }`;
-}
-
-/** Builds every 'HH:MM' slot between START_HOUR and END_HOUR, every SLOT_MINUTES. */
-function buildAllSlots(): string[] {
-    const slots: string[] = [];
-    for ( let hour = START_HOUR; hour < END_HOUR; hour++ ) {
-        for ( let minute = 0; minute < 60; minute += SLOT_MINUTES ) {
-            slots.push( `${ String( hour ).padStart( 2, '0' ) }:${ String( minute ).padStart( 2, '0' ) }` );
-        }
-    }
-    return slots;
-}
-
-export default function SelectDateTime( { onSelect, onBack }: Props ) {
+export default function SelectDateTime( { staffId, serviceId, onSelect, onBack }: Props ) {
     const [ date, setDate ] = useState( '' );
     const [ time, setTime ] = useState( '' );
+    const [ slots, setSlots ] = useState<string[]>( [] );
+    const [ loadingSlots, setLoadingSlots ] = useState( false );
     const [ error, setError ] = useState( '' );
 
     const today = getTodayString();
 
-    const availableSlots = useMemo( () => {
-        const allSlots = buildAllSlots();
-        if ( date !== today ) {
-            return allSlots;
+    useEffect( () => {
+        if ( ! date ) {
+            setSlots( [] );
+            return;
         }
-        const nowTime = getCurrentTimeString();
-        return allSlots.filter( ( slot ) => slot > nowTime );
-    }, [ date, today ] );
+
+        setLoadingSlots( true );
+        setTime( '' );
+
+        fetch( `/wp-json/mitii/v1/staff/${ staffId }/available-slots?date=${ date }&service_id=${ serviceId }` )
+            .then( ( res ) => res.json() )
+            .then( ( data ) => {
+                setSlots( Array.isArray( data ) ? data : [] );
+                setLoadingSlots( false );
+            } )
+            .catch( () => {
+                setSlots( [] );
+                setLoadingSlots( false );
+            } );
+    }, [ date, staffId, serviceId ] );
 
     const handleDateChange = ( newDate: string ) => {
         setDate( newDate );
-        setTime( '' ); // picking a new date always clears the previously chosen slot
         setError( '' );
     };
 
@@ -85,21 +77,28 @@ export default function SelectDateTime( { onSelect, onBack }: Props ) {
             { date && (
                 <div className="mitii-widget-field">
                     <label>Time</label>
-                    <div className="mitii-slot-grid">
-                        { availableSlots.length === 0 && (
-                            <p className="mitii-slot-empty">No time slots left today — please choose another date.</p>
-                        ) }
-                        { availableSlots.map( ( slot ) => (
-                            <button
-                                key={ slot }
-                                type="button"
-                                className={ `mitii-slot-button${ slot === time ? ' is-selected' : '' }` }
-                                onClick={ () => setTime( slot ) }
-                            >
-                                { slot }
-                            </button>
-                        ) ) }
-                    </div>
+
+                    { loadingSlots && <p className="mitii-widget-loading">Checking availability...</p> }
+
+                    { ! loadingSlots && (
+                        <div className="mitii-slot-grid">
+                            { slots.length === 0 && (
+                                <p className="mitii-slot-empty">
+                                    No availability on this date — please choose another day.
+                                </p>
+                            ) }
+                            { slots.map( ( slot ) => (
+                                <button
+                                    key={ slot }
+                                    type="button"
+                                    className={ `mitii-slot-button${ slot === time ? ' is-selected' : '' }` }
+                                    onClick={ () => setTime( slot ) }
+                                >
+                                    { slot }
+                                </button>
+                            ) ) }
+                        </div>
+                    ) }
                 </div>
             ) }
 
