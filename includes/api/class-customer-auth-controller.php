@@ -34,8 +34,7 @@ class Mitii_Customer_Auth_Controller {
         $table = $wpdb->prefix . 'mitii_customers';
 
         $name     = sanitize_text_field( $request['name'] );
-        $email    = sanitize_email( $request['email'] );
-        $password = $request['password'];
+        $email = sanitize_email( strtolower( trim( $request['email'] ) ) );        $password = $request['password'];
 
         if ( empty( $name ) || empty( $email ) || empty( $password ) ) {
             return new WP_Error( 'missing_fields', 'Name, email, and password are all required', array( 'status' => 400 ) );
