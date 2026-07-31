@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 define( 'MITII_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MITII_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
+
+require_once MITII_PLUGIN_DIR . 'includes/api/class-availability-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/admin/class-mitii-admin-menu.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-activator.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-services-controller.php';
@@ -36,3 +38,4 @@ add_action( 'init', array( 'Mitii_Shortcode', 'register' ) );
 add_action( 'wp_enqueue_scripts', array( 'Mitii_Shortcode', 'enqueue_assets' ) );
 add_action( 'init', array( 'Mitii_Staff_First_Shortcode', 'register' ) );
 add_action( 'wp_enqueue_scripts', array( 'Mitii_Staff_First_Shortcode', 'enqueue_assets' ) );
+add_action( 'rest_api_init', array( 'Mitii_Availability_Controller', 'register_routes' ) );
