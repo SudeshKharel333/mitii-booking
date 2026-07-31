@@ -99,8 +99,10 @@ export default function App() {
     />
 ) }
 
-                    { step === 3 && (
+                    { step === 3 && booking.service && booking.staff && (
                         <SelectDateTime
+                            staffId={ booking.staff.id }
+                            serviceId={ booking.service.id }
                             onSelect={ ( date, time ) => {
                                 setBooking( { ...booking, date, time } );
                                 goNext();
