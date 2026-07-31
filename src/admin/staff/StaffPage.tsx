@@ -16,6 +16,23 @@ type Service = {
     name: string;
 };
 
+type AvailabilityRow = {
+    day_of_week: number;
+    start_time: string;
+    end_time: string;
+};
+
+type DaySchedule = {
+    enabled: boolean;
+    start: string;
+    end: string;
+};
+
+const DAY_NAMES = [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ];
+
+const emptyWeek = (): DaySchedule[] =>
+    DAY_NAMES.map( () => ( { enabled: false, start: '09:00', end: '18:00' } ) );
+
 declare global {
     interface Window {
         wp: any;
@@ -34,6 +51,10 @@ export default function StaffPage() {
     const [ imageUrl, setImageUrl ] = useState( '' );
     const [ selectedServiceIds, setSelectedServiceIds ] = useState<number[]>( [] );
     const [ error, setError ] = useState( '' );
+
+    const [ week, setWeek ] = useState<DaySchedule[]>( emptyWeek() );
+    const [ scheduleMessage, setScheduleMessage ] = useState( '' );
+    const [ scheduleSaving, setScheduleSaving ] = useState( false );
 
     const loadAll = () => {
         setLoading( true );
@@ -58,6 +79,8 @@ export default function StaffPage() {
         setBio( '' );
         setImageUrl( '' );
         setSelectedServiceIds( [] );
+        setWeek( emptyWeek() );
+        setScheduleMessage( '' );
         setError( '' );
     };
 
@@ -68,6 +91,23 @@ export default function StaffPage() {
         setBio( staff.bio );
         setImageUrl( staff.image_url || '' );
         setSelectedServiceIds( staff.service_ids || [] );
+        setScheduleMessage( '' );
+
+        fetch( `/wp-json/mitii/v1/staff/${ staff.id }/availability`, {
+            headers: { 'X-WP-Nonce': ( window as any ).mitiiAdminData?.nonce },
+        } )
+            .then( ( res ) => res.json() )
+            .then( ( rows: AvailabilityRow[] ) => {
+                const newWeek = emptyWeek();
+                rows.forEach( ( row ) => {
+                    newWeek[ row.day_of_week ] = {
+                        enabled: true,
+                        start: row.start_time.slice( 0, 5 ),
+                        end: row.end_time.slice( 0, 5 ),
+                    };
+                } );
+                setWeek( newWeek );
+            } );
     };
 
     const toggleService = ( serviceId: number ) => {
@@ -75,6 +115,12 @@ export default function StaffPage() {
             current.includes( serviceId )
                 ? current.filter( ( id ) => id !== serviceId )
                 : [ ...current, serviceId ]
+        );
+    };
+
+    const updateDay = ( dayIndex: number, changes: Partial<DaySchedule> ) => {
+        setWeek( ( current ) =>
+            current.map( ( day, i ) => ( i === dayIndex ? { ...day, ...changes } : day ) )
         );
     };
 
@@ -132,6 +178,44 @@ export default function StaffPage() {
                 }
             } )
             .catch( () => setError( 'Network error. Please try again.' ) );
+    };
+
+    const handleSaveSchedule = () => {
+        if ( editingId === null ) return;
+
+        setScheduleSaving( true );
+        setScheduleMessage( '' );
+
+        const availability = week
+            .map( ( day, index ) => ( { ...day, day_of_week: index } ) )
+            .filter( ( day ) => day.enabled )
+            .map( ( day ) => ( {
+                day_of_week: day.day_of_week,
+                start_time: day.start,
+                end_time: day.end,
+            } ) );
+
+        fetch( `/wp-json/mitii/v1/staff/${ editingId }/availability`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': ( window as any ).mitiiAdminData?.nonce,
+            },
+            body: JSON.stringify( { availability } ),
+        } )
+            .then( ( res ) => res.json() )
+            .then( ( data ) => {
+                setScheduleSaving( false );
+                if ( data.code ) {
+                    setScheduleMessage( data.message || 'Could not save schedule.' );
+                } else {
+                    setScheduleMessage( 'Working hours saved.' );
+                }
+            } )
+            .catch( () => {
+                setScheduleSaving( false );
+                setScheduleMessage( 'Network error. Please try again.' );
+            } );
     };
 
     const handleDelete = ( id: number ) => {
@@ -232,6 +316,62 @@ export default function StaffPage() {
                     ) }
                 </div>
             </div>
+
+            { editingId !== null && (
+                <div className="mitii-card">
+                    <h2>Working Hours</h2>
+                    <p className="mitii-hint" style={ { marginBottom: '14px' } }>
+                        Turn on the days this staff member works, and set their hours. Customers will
+                        only be able to book slots inside these hours — and only ones not already booked.
+                    </p>
+
+                    { DAY_NAMES.map( ( dayName, index ) => (
+                        <div
+                            key={ dayName }
+                            style={ {
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                padding: '8px 0',
+                                borderBottom: index < 6 ? '1px solid #eee' : 'none',
+                            } }
+                        >
+                            <label style={ { display: 'flex', alignItems: 'center', gap: '8px', width: '130px', fontWeight: 600, fontSize: '14px' } }>
+                                <input
+                                    type="checkbox"
+                                    checked={ week[ index ].enabled }
+                                    onChange={ ( e ) => updateDay( index, { enabled: e.target.checked } ) }
+                                />
+                                { dayName }
+                            </label>
+
+                            { week[ index ].enabled && (
+                                <>
+                                    <input
+                                        type="time"
+                                        value={ week[ index ].start }
+                                        onChange={ ( e ) => updateDay( index, { start: e.target.value } ) }
+                                    />
+                                    <span style={ { fontSize: '13px', color: '#888' } }>to</span>
+                                    <input
+                                        type="time"
+                                        value={ week[ index ].end }
+                                        onChange={ ( e ) => updateDay( index, { end: e.target.value } ) }
+                                    />
+                                </>
+                            ) }
+                        </div>
+                    ) ) }
+
+                    { scheduleMessage && <p className="mitii-hint" style={ { marginTop: '10px' } }>{ scheduleMessage }</p> }
+
+                    <div className="mitii-btn-row" style={ { marginTop: '14px' } }>
+                        <button className="mitii-btn mitii-btn-primary" onClick={ handleSaveSchedule } disabled={ scheduleSaving }>
+                            { scheduleSaving ? 'Saving...' : 'Save Working Hours' }
+                        </button>
+                    </div>
+                </div>
+            ) }
 
             <h2>Existing Staff</h2>
 
