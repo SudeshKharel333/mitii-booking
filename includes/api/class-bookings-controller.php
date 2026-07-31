@@ -15,8 +15,7 @@ class Mitii_Bookings_Controller {
                     __( 'You do not have permission to view bookings.' ), 
                     array( 'status' => 403 ) 
                 );
-            }
-
+}
             // Optional: Standard WP REST automatically checks X-WP-Nonce for cookie auth.
             // But if you are passing a custom nonce in headers (e.g., 'X-Mitii-Nonce'):
             $nonce = $request->get_header( 'x_mitii_nonce' );
