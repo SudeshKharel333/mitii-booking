@@ -144,6 +144,27 @@ export default function StaffPage() {
         frame.open();
     };
 
+    const buildAvailabilityPayload = () =>
+        week
+            .map( ( day, index ) => ( { ...day, day_of_week: index } ) )
+            .filter( ( day ) => day.enabled )
+            .map( ( day ) => ( {
+                day_of_week: day.day_of_week,
+                start_time: day.start,
+                end_time: day.end,
+            } ) );
+
+    const saveAvailability = ( staffId: number ) => {
+        return fetch( `/wp-json/mitii/v1/staff/${ staffId }/availability`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': ( window as any ).mitiiAdminData?.nonce,
+            },
+            body: JSON.stringify( { availability: buildAvailabilityPayload() } ),
+        } ).then( ( res ) => res.json() );
+    };
+
     const handleSubmit = () => {
         if ( ! name ) {
             setError( 'Name is required.' );
@@ -172,10 +193,18 @@ export default function StaffPage() {
             .then( ( data ) => {
                 if ( data.code ) {
                     setError( data.message || 'Something went wrong.' );
-                } else {
+                    return;
+                }
+
+                // Whether this was a brand-new staff member (data.id) or an
+                // existing one being edited (editingId), save their working
+                // hours right along with the rest of the form.
+                const staffId = isEditing ? editingId! : data.id;
+
+                saveAvailability( staffId ).then( () => {
                     resetForm();
                     loadAll();
-                }
+                } );
             } )
             .catch( () => setError( 'Network error. Please try again.' ) );
     };
@@ -186,24 +215,7 @@ export default function StaffPage() {
         setScheduleSaving( true );
         setScheduleMessage( '' );
 
-        const availability = week
-            .map( ( day, index ) => ( { ...day, day_of_week: index } ) )
-            .filter( ( day ) => day.enabled )
-            .map( ( day ) => ( {
-                day_of_week: day.day_of_week,
-                start_time: day.start,
-                end_time: day.end,
-            } ) );
-
-        fetch( `/wp-json/mitii/v1/staff/${ editingId }/availability`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-WP-Nonce': ( window as any ).mitiiAdminData?.nonce,
-            },
-            body: JSON.stringify( { availability } ),
-        } )
-            .then( ( res ) => res.json() )
+        saveAvailability( editingId )
             .then( ( data ) => {
                 setScheduleSaving( false );
                 if ( data.code ) {
@@ -317,61 +329,62 @@ export default function StaffPage() {
                 </div>
             </div>
 
-            { editingId !== null && (
-                <div className="mitii-card">
-                    <h2>Working Hours</h2>
-                    <p className="mitii-hint" style={ { marginBottom: '14px' } }>
-                        Turn on the days this staff member works, and set their hours. Customers will
-                        only be able to book slots inside these hours — and only ones not already booked.
-                    </p>
+            <div className="mitii-card">
+                <h2>Working Hours</h2>
+                <p className="mitii-hint" style={ { marginBottom: '14px' } }>
+                    Turn on the days this staff member works, and set their hours. Customers will
+                    only be able to book slots inside these hours — and only ones not already booked.
+                    { editingId === null && ' This gets saved together when you click "Add Staff Member" below.' }
+                </p>
 
-                    { DAY_NAMES.map( ( dayName, index ) => (
-                        <div
-                            key={ dayName }
-                            style={ {
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '10px',
-                                padding: '8px 0',
-                                borderBottom: index < 6 ? '1px solid #eee' : 'none',
-                            } }
-                        >
-                            <label style={ { display: 'flex', alignItems: 'center', gap: '8px', width: '130px', fontWeight: 600, fontSize: '14px' } }>
+                { DAY_NAMES.map( ( dayName, index ) => (
+                    <div
+                        key={ dayName }
+                        style={ {
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 0',
+                            borderBottom: index < 6 ? '1px solid #eee' : 'none',
+                        } }
+                    >
+                        <label style={ { display: 'flex', alignItems: 'center', gap: '8px', width: '130px', fontWeight: 600, fontSize: '14px' } }>
+                            <input
+                                type="checkbox"
+                                checked={ week[ index ].enabled }
+                                onChange={ ( e ) => updateDay( index, { enabled: e.target.checked } ) }
+                            />
+                            { dayName }
+                        </label>
+
+                        { week[ index ].enabled && (
+                            <>
                                 <input
-                                    type="checkbox"
-                                    checked={ week[ index ].enabled }
-                                    onChange={ ( e ) => updateDay( index, { enabled: e.target.checked } ) }
+                                    type="time"
+                                    value={ week[ index ].start }
+                                    onChange={ ( e ) => updateDay( index, { start: e.target.value } ) }
                                 />
-                                { dayName }
-                            </label>
+                                <span style={ { fontSize: '13px', color: '#888' } }>to</span>
+                                <input
+                                    type="time"
+                                    value={ week[ index ].end }
+                                    onChange={ ( e ) => updateDay( index, { end: e.target.value } ) }
+                                />
+                            </>
+                        ) }
+                    </div>
+                ) ) }
 
-                            { week[ index ].enabled && (
-                                <>
-                                    <input
-                                        type="time"
-                                        value={ week[ index ].start }
-                                        onChange={ ( e ) => updateDay( index, { start: e.target.value } ) }
-                                    />
-                                    <span style={ { fontSize: '13px', color: '#888' } }>to</span>
-                                    <input
-                                        type="time"
-                                        value={ week[ index ].end }
-                                        onChange={ ( e ) => updateDay( index, { end: e.target.value } ) }
-                                    />
-                                </>
-                            ) }
-                        </div>
-                    ) ) }
+                { scheduleMessage && <p className="mitii-hint" style={ { marginTop: '10px' } }>{ scheduleMessage }</p> }
 
-                    { scheduleMessage && <p className="mitii-hint" style={ { marginTop: '10px' } }>{ scheduleMessage }</p> }
-
+                { editingId !== null && (
                     <div className="mitii-btn-row" style={ { marginTop: '14px' } }>
                         <button className="mitii-btn mitii-btn-primary" onClick={ handleSaveSchedule } disabled={ scheduleSaving }>
                             { scheduleSaving ? 'Saving...' : 'Save Working Hours' }
                         </button>
                     </div>
-                </div>
-            ) }
+                ) }
+            </div>
 
             <h2>Existing Staff</h2>
 
