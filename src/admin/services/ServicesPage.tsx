@@ -10,11 +10,26 @@ type Service = {
     image_url: string;
 };
 
-// Minimal shape of the parts of window.wp.media we actually use.
 declare global {
     interface Window {
         wp: any;
     }
+}
+
+function NavPills( { active }: { active: 'bookings' | 'services' | 'staff' } ) {
+    return (
+        <div className="mitii-nav-pills">
+            <a href="admin.php?page=mitii-bookings" className={ `mitii-nav-pill${ active === 'bookings' ? ' is-active' : '' }` }>
+                Bookings
+            </a>
+            <a href="admin.php?page=mitii-services" className={ `mitii-nav-pill${ active === 'services' ? ' is-active' : '' }` }>
+                Services
+            </a>
+            <a href="admin.php?page=mitii-staff" className={ `mitii-nav-pill${ active === 'staff' ? ' is-active' : '' }` }>
+                Staff
+            </a>
+        </div>
+    );
 }
 
 export default function ServicesPage() {
@@ -137,6 +152,7 @@ export default function ServicesPage() {
 
     return (
         <div className="mitii-admin">
+            <NavPills active="services" />
             <h1>Services</h1>
             <p className="mitii-subtitle">Manage what customers can book.</p>
 
@@ -147,33 +163,40 @@ export default function ServicesPage() {
                     <label>Name</label>
                     <input type="text" value={ name } onChange={ ( e ) => setName( e.target.value ) } />
                 </div>
-                <div className="mitii-field">
-                    <label>Duration (minutes)</label>
-                    <input type="number" value={ duration } onChange={ ( e ) => setDuration( e.target.value ) } />
-                </div>
-                <div className="mitii-field">
-                    <label>Price ($)</label>
-                    <input type="number" step="0.01" value={ price } onChange={ ( e ) => setPrice( e.target.value ) } />
+
+                <div className="mitii-two-col">
+                    <div className="mitii-field">
+                        <label>Duration (minutes)</label>
+                        <input type="number" value={ duration } onChange={ ( e ) => setDuration( e.target.value ) } />
+                    </div>
+                    <div className="mitii-field">
+                        <label>Price ($)</label>
+                        <input type="number" step="0.01" value={ price } onChange={ ( e ) => setPrice( e.target.value ) } />
+                    </div>
                 </div>
 
                 <div className="mitii-field">
                     <label>Service Image</label>
-                    { imageUrl && (
-                        <img
-                            src={ imageUrl }
-                            alt="Service preview"
-                            style={ { width: '100%', maxWidth: '200px', borderRadius: '8px', marginBottom: '8px', display: 'block' } }
-                        />
-                    ) }
-                    <div className="mitii-btn-row">
-                        <button type="button" className="mitii-btn mitii-btn-secondary" onClick={ openMediaPicker }>
-                            { imageUrl ? 'Change Image' : 'Choose Image' }
-                        </button>
+                    <div className="mitii-upload-zone">
                         { imageUrl && (
-                            <button type="button" className="mitii-btn mitii-btn-secondary" onClick={ () => setImageUrl( '' ) }>
-                                Remove Image
-                            </button>
+                            <img
+                                src={ imageUrl }
+                                alt="Service preview"
+                                className="mitii-upload-preview"
+                                style={ { width: '160px', height: '110px', borderRadius: '8px' } }
+                            />
                         ) }
+                        <div className="mitii-btn-row" style={ { justifyContent: 'center' } }>
+                            <button type="button" className="mitii-btn mitii-btn-secondary" onClick={ openMediaPicker }>
+                                { imageUrl ? 'Change Image' : 'Choose Image' }
+                            </button>
+                            { imageUrl && (
+                                <button type="button" className="mitii-btn mitii-btn-secondary" onClick={ () => setImageUrl( '' ) }>
+                                    Remove
+                                </button>
+                            ) }
+                        </div>
+                        { ! imageUrl && <p className="mitii-hint">No image selected yet</p> }
                     </div>
                 </div>
 
@@ -217,7 +240,7 @@ export default function ServicesPage() {
                                                 style={ { width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px' } }
                                             />
                                         ) : (
-                                            <span style={ { color: '#999', fontSize: '12px' } }>No image</span>
+                                            <span className="mitii-hint">No image</span>
                                         ) }
                                     </td>
                                     <td>{ s.name }</td>

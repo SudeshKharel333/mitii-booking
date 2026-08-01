@@ -55,8 +55,18 @@ class Mitii_Bookings_Controller {
 
     public static function get_bookings( $request ) {
         global $wpdb;
-        $table = $wpdb->prefix . 'mitii_bookings';
-        $results = $wpdb->get_results( "SELECT * FROM $table ORDER BY id DESC" );
+        $bookings_table = $wpdb->prefix . 'mitii_bookings';
+        $services_table = $wpdb->prefix . 'mitii_services';
+        $staff_table    = $wpdb->prefix . 'mitii_staff';
+
+        $results = $wpdb->get_results(
+            "SELECT b.*, s.name AS service_name, s.price AS service_price, st.name AS staff_name
+             FROM $bookings_table b
+             LEFT JOIN $services_table s ON b.service_id = s.id
+             LEFT JOIN $staff_table st ON b.staff_id = st.id
+             ORDER BY b.id DESC"
+        );
+
         return rest_ensure_response( $results );
     }
 
