@@ -244,7 +244,7 @@ export default function StaffPage() {
             .catch( () => setError( 'Could not delete staff member.' ) );
     };
 
-    const serviceNameById = ( id: number ) => services.find( ( s ) => s.id === id )?.name || 'Unknown';
+    const serviceNameById = ( id: number ) => services.find( ( s ) => Number( s.id ) === id )?.name || 'Unknown';
 
     return (
         <div className="mitii-admin">
@@ -307,8 +307,8 @@ export default function StaffPage() {
                                 <label key={ service.id }>
                                     <input
                                         type="checkbox"
-                                        checked={ selectedServiceIds.includes( service.id ) }
-                                        onChange={ () => toggleService( service.id ) }
+                                        checked={ selectedServiceIds.includes( Number( service.id ) ) }
+                                        onChange={ () => toggleService( Number( service.id ) ) }
                                     />
                                     { service.name }
                                 </label>

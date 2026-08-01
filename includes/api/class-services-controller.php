@@ -46,6 +46,15 @@ register_rest_route( 'mitii/v1', '/staff/(?P<staff_id>\d+)/services', array(
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_services';
         $results = $wpdb->get_results( "SELECT * FROM $table ORDER BY id DESC" );
+
+        // $wpdb returns every column as a string by default — cast the
+        // numeric ones explicitly so JS-side comparisons (e.g. against the
+        // numeric service_ids array from /staff) work correctly.
+        foreach ( $results as $service ) {
+            $service->id                = intval( $service->id );
+            $service->duration_minutes  = intval( $service->duration_minutes );
+        }
+
         return rest_ensure_response( $results );
     }
 
@@ -96,6 +105,11 @@ register_rest_route( 'mitii/v1', '/staff/(?P<staff_id>\d+)/services', array(
                 $staff_id
             )
         );
+
+        foreach ( $results as $service ) {
+            $service->id               = intval( $service->id );
+            $service->duration_minutes = intval( $service->duration_minutes );
+        }
  
         return rest_ensure_response( $results );
     }
