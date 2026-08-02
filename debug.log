@@ -4,3 +4,9 @@
 [23-Jul-2026 09:30:36 UTC]   Automatic plugin updates complete.
 [23-Jul-2026 09:30:37 UTC] Automatic updates complete.
 [24-Jul-2026 10:33:06 UTC] WordPress database error Duplicate entry '4-3' for key 'wp_mitii_staff_services.staff_service_unique' for query INSERT INTO `wp_mitii_staff_services` (`staff_id`, `service_id`) VALUES ('4', '3') made by require('wp-blog-header.php'), wp, WP->main, WP->parse_request, do_action_ref_array('parse_request'), WP_Hook->do_action, WP_Hook->apply_filters, rest_api_loaded, WP_REST_Server->serve_request, WP_REST_Server->dispatch, WP_REST_Server->respond_to_request, Mitii_Staff_Controller::update_staff, Mitii_Staff_Controller::set_services_for_staff
+[01-Aug-2026 08:42:07 UTC] Automatic updates starting...
+[01-Aug-2026 08:42:09 UTC] Automatic updates complete.
+[01-Aug-2026 09:45:50 UTC] Automatic updates starting...
+[01-Aug-2026 09:45:50 UTC] Automatic updates complete.
+[02-Aug-2026 09:28:41 UTC] Automatic updates starting...
+[02-Aug-2026 09:28:45 UTC] Automatic updates complete.

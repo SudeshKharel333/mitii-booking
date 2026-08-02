@@ -264,3 +264,54 @@
   color: var(--mitii-ink-soft);
   margin: 0;
 }
+/* ---- Ticket-stub shell (matches the booking widget's visual theme, and
+   the outer container App.tsx actually renders) ---- */
+.mitii-portal-ticket {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(42, 42, 40, 0.10), 0 1px 3px rgba(42, 42, 40, 0.06);
+  overflow: hidden;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.mitii-portal-ticket-header {
+  background: var(--mitii-teal);
+  color: #fff;
+  padding: 22px 26px 18px;
+  position: relative;
+}
+
+.mitii-portal-ticket-header::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background:
+    radial-gradient(circle at 10px 0, transparent 10px, var(--mitii-teal) 10.5px) top left,
+    radial-gradient(circle at calc(100% - 10px) 0, transparent 10px, var(--mitii-teal) 10.5px) top right;
+  background-size: 20px 20px;
+  background-repeat: repeat-x;
+}
+
+.mitii-portal-ticket-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mitii-gold-light);
+  opacity: 0.9;
+  margin: 0 0 4px;
+}
+
+.mitii-portal-ticket-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.mitii-portal-ticket-body {
+  padding: 30px 26px 26px;
+}
