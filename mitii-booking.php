@@ -13,7 +13,9 @@ define( 'MITII_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 require_once MITII_PLUGIN_DIR . 'includes/api/class-availability-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/admin/class-mitii-admin-menu.php';
+require_once MITII_PLUGIN_DIR . 'includes/class-mitii-session-cleanup.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-activator.php';
+require_once MITII_PLUGIN_DIR . 'includes/class-mitii-deactivator.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-services-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-staff-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-bookings-controller.php';
@@ -23,6 +25,8 @@ require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-session.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-staff-first-shortcode.php';
 
 register_activation_hook( __FILE__, array( 'Mitii_Activator', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'Mitii_Deactivator', 'deactivate' ) );
+add_action( Mitii_Session_Cleanup::CRON_HOOK, array( 'Mitii_Session_Cleanup', 'run_cleanup' ) );
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-portal-shortcode.php';
 
 add_action( 'init', array( 'Mitii_Customer_Portal_Shortcode', 'register' ) );
