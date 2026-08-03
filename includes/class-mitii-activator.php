@@ -114,6 +114,9 @@ if ( ! get_role( 'mitii_customer' ) ) {
     ) );
 }
 
+// ---- Schedule the daily cleanup of expired customer sessions ----
+Mitii_Session_Cleanup::schedule();
+
 
     }
 
