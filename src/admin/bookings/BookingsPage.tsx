@@ -35,8 +35,10 @@ function NavPills( { active }: { active: 'bookings' | 'services' | 'staff' } ) {
 export default function BookingsPage() {
     const [ bookings, setBookings ] = useState<Booking[]>( [] );
     const [ loading, setLoading ] = useState( true );
+    const [ error, setError ] = useState( '' );
 
-    useEffect( () => {
+    const loadBookings = () => {
+        setLoading( true );
         fetch( '/wp-json/mitii/v1/bookings', {
             headers: { 'X-WP-Nonce': ( window as any ).mitiiAdminData?.nonce },
         } )
@@ -45,7 +47,39 @@ export default function BookingsPage() {
                 setBookings( Array.isArray( data ) ? data : [] );
                 setLoading( false );
             } );
+    };
+
+    useEffect( () => {
+        loadBookings();
     }, [] );
+
+    const handleStatusChange = ( id: number, newStatus: string ) => {
+        // Update the UI immediately, so the dropdown feels instant —
+        // if the request fails, we just reload to get the real state back.
+        setBookings( ( current ) =>
+            current.map( ( b ) => ( b.id === id ? { ...b, status: newStatus } : b ) )
+        );
+
+        fetch( `/wp-json/mitii/v1/bookings/${ id }/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': ( window as any ).mitiiAdminData?.nonce,
+            },
+            body: JSON.stringify( { status: newStatus } ),
+        } )
+            .then( ( res ) => res.json() )
+            .then( ( data ) => {
+                if ( data.code ) {
+                    setError( data.message || 'Could not update status.' );
+                    loadBookings(); // revert to the real server state
+                }
+            } )
+            .catch( () => {
+                setError( 'Network error. Please try again.' );
+                loadBookings();
+            } );
+    };
 
     if ( loading ) {
         return (
@@ -70,6 +104,7 @@ export default function BookingsPage() {
             <NavPills active="bookings" />
             <h1>Bookings</h1>
             <p className="mitii-subtitle">All appointments booked by customers.</p>
+            { error && <p className="mitii-error">{ error }</p> }
 
             <div className="mitii-stat-grid">
                 <div className="mitii-stat-card">
@@ -117,7 +152,15 @@ export default function BookingsPage() {
                                     <td>{ b.booking_time }</td>
                                     <td>{ b.service_price ? `$${ b.service_price }` : '—' }</td>
                                     <td>
-                                        <span className={ `mitii-badge mitii-badge-${ b.status }` }>{ b.status }</span>
+                                        <select
+                                            className={ `mitii-status-select mitii-badge mitii-badge-${ b.status }` }
+                                            value={ b.status }
+                                            onChange={ ( e ) => handleStatusChange( b.id, e.target.value ) }
+                                        >
+                                            <option value="pending">Pending</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="cancelled">Cancelled</option>
+                                        </select>
                                     </td>
                                 </tr>
                             ) ) }

@@ -49,8 +49,18 @@ class Mitii_Bookings_Controller {
         'permission_callback' => array( __CLASS__, 'check_logged_in' ),
     ) );
 
+    register_rest_route( 'mitii/v1', '/bookings/(?P<id>\d+)/status', array(
+        'methods'             => 'PUT',
+        'callback'            => array( __CLASS__, 'update_booking_status' ),
+        'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
+    ) );
 
 
+
+    }
+
+    public static function check_admin_permission() {
+        return current_user_can( 'manage_options' );
     }
 
     public static function get_bookings( $request ) {
@@ -167,6 +177,32 @@ public static function cancel_my_booking( $request ) {
     $wpdb->update( $table, array( 'status' => 'cancelled' ), array( 'id' => $id ) );
 
     return rest_ensure_response( array( 'id' => $id, 'message' => 'Booking cancelled' ) );
+}
+
+public static function update_booking_status( $request ) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'mitii_bookings';
+    $id     = intval( $request['id'] );
+    $status = sanitize_text_field( $request['status'] );
+
+    $allowed_statuses = array( 'pending', 'completed', 'cancelled' );
+
+    if ( ! in_array( $status, $allowed_statuses, true ) ) {
+        return new WP_Error(
+            'invalid_status',
+            'Status must be one of: ' . implode( ', ', $allowed_statuses ),
+            array( 'status' => 400 )
+        );
+    }
+
+    $booking = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM $table WHERE id = %d", $id ) );
+    if ( ! $booking ) {
+        return new WP_Error( 'not_found', 'Booking not found', array( 'status' => 404 ) );
+    }
+
+    $wpdb->update( $table, array( 'status' => $status ), array( 'id' => $id ) );
+
+    return rest_ensure_response( array( 'id' => $id, 'status' => $status, 'message' => 'Booking status updated' ) );
 }
 
 }
