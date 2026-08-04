@@ -22,7 +22,7 @@ export default function BookingsList( { onChanged }: Props ) {
 
     const loadBookings = () => {
         setLoading( true );
-        fetch( '/wp-json/mitii/v1/my-bookings', { credentials: 'same-origin' } )
+        fetch( '/wp-json/mitii/v1/my-bookings?per_page=50', { credentials: 'same-origin' } )
             .then( ( res ) => res.json() )
             .then( ( data ) => {
                 setBookings( Array.isArray( data ) ? data : [] );
