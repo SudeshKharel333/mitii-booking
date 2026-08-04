@@ -5,12 +5,14 @@
  * Version: 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 define( 'MITII_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MITII_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
-
+// Load core classes
 require_once MITII_PLUGIN_DIR . 'includes/api/class-availability-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/admin/class-mitii-admin-menu.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-session-cleanup.php';
@@ -25,30 +27,41 @@ require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-session.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-rate-limiter.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-staff-first-shortcode.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-email.php';
-require_once MITII_PLUGIN_DIR . 'includes/class-mitii-session-cleanup.php';
+require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-portal-shortcode.php';
 
+// Activation / deactivation
 register_activation_hook( __FILE__, array( 'Mitii_Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'Mitii_Deactivator', 'deactivate' ) );
 add_action( Mitii_Session_Cleanup::CRON_HOOK, array( 'Mitii_Session_Cleanup', 'run_cleanup' ) );
-require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-portal-shortcode.php';
 
+// Shortcodes
+add_action( 'init', array( 'Mitii_Shortcode', 'register' ) );
+add_action( 'wp_enqueue_scripts', array( 'Mitii_Shortcode', 'enqueue_assets' ) );
+add_action( 'init', array( 'Mitii_Staff_First_Shortcode', 'register' ) );
+add_action( 'wp_enqueue_scripts', array( 'Mitii_Staff_First_Shortcode', 'enqueue_assets' ) );
 add_action( 'init', array( 'Mitii_Customer_Portal_Shortcode', 'register' ) );
-add_action( 'wp_enqueue_scripts', array( 'Miii_Customer_Portal_Shortcode', 'enqueue_assets' ) );
+add_action( 'wp_enqueue_scripts', array( 'Mitii_Customer_Portal_Shortcode', 'enqueue_assets' ) );
+
+// Email "From" address / name
 add_filter( 'wp_mail_from', function( $from ) {
-	return 'bookings@' . parse_url( home_url(), PHP_URL_HOST );
+	$host = parse_url( home_url(), PHP_URL_HOST );
+	if ( empty( $host ) ) {
+		$host = 'localhost';
+	}
+	return 'bookings@' . $host;
 } );
 
 add_filter( 'wp_mail_from_name', function( $name ) {
 	return get_bloginfo( 'name' ) . ' Bookings';
 } );
+
+// REST API routes
 add_action( 'rest_api_init', array( 'Mitii_Customer_Auth_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Services_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Staff_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Bookings_Controller', 'register_routes' ) );
+add_action( 'rest_api_init', array( 'Mitii_Availability_Controller', 'register_routes' ) );
+
+// Admin menu
 add_action( 'admin_menu', array( 'Mitii_Admin_Menu', 'register' ) );
 add_action( 'admin_enqueue_scripts', array( 'Mitii_Admin_Menu', 'enqueue_assets' ) );
-add_action( 'init', array( 'Mitii_Shortcode', 'register' ) );
-add_action( 'wp_enqueue_scripts', array( 'Mitii_Shortcode', 'enqueue_assets' ) );
-add_action( 'init', array( 'Mitii_Staff_First_Shortcode', 'register' ) );
-add_action( 'wp_enqueue_scripts', array( 'Mitii_Staff_First_Shortcode', 'enqueue_assets' ) );
-add_action( 'rest_api_init', array( 'Mitii_Availability_Controller', 'register_routes' ) );

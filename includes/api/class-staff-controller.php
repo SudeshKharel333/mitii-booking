@@ -50,21 +50,27 @@ class Mitii_Staff_Controller {
     }
 
     // ---- Helper: replace a staff member's assigned services entirely ----
-    private static function set_services_for_staff( $staff_id, $service_ids ) {
-        global $wpdb;
-        $table = $wpdb->prefix . 'mitii_staff_services';
+   private static function set_services_for_staff( $staff_id, $service_ids ) {
+	global $wpdb;
+	$table = $wpdb->prefix . 'mitii_staff_services';
 
-        // Remove all existing assignments for this staff member first
-        $wpdb->delete( $table, array( 'staff_id' => $staff_id ) );
+	// Remove all existing assignments for this staff member first
+	$wpdb->delete( $table, array( 'staff_id' => $staff_id ) );
 
-        // Then insert the new set
-        foreach ( $service_ids as $service_id ) {
-            $wpdb->insert( $table, array(
-                'staff_id'   => $staff_id,
-                'service_id' => intval( $service_id ),
-            ) );
-        }
-    }
+	// Deduplicate and sanitize before inserting
+	$service_ids = array_unique( array_map( 'intval', (array) $service_ids ) );
+
+	// Then insert the new set
+	foreach ( $service_ids as $service_id ) {
+		if ( $service_id <= 0 ) {
+			continue;
+		}
+		$wpdb->insert( $table, array(
+			'staff_id'   => $staff_id,
+			'service_id' => $service_id,
+		) );
+	}
+}
 
     public static function get_staff( $request ) {
         global $wpdb;
