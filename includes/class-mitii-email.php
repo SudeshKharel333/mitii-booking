@@ -154,10 +154,16 @@ class Mitii_Email {
 	 * ---------------------------------------------------------------------- */
 
 	private static function get_email_wrapper( $content ) {
-		$site_name = get_bloginfo( 'name' );
-		$site_url  = home_url();
+	$site_name = get_bloginfo( 'name' );
+	$site_url  = home_url();
 
-		return '<!DOCTYPE html>
+	$footer_text = sprintf(
+		/* translators: %s: site name with link */
+		__( 'You are receiving this email because of an appointment at %s.', 'mitii-booking' ),
+		'<a href="' . esc_url( $site_url ) . '" style="color:#4f46e5;text-decoration:none;">' . esc_html( $site_name ) . '</a>'
+	);
+
+	return '<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -180,7 +186,7 @@ class Mitii_Email {
         </tr>
         <tr>
           <td style="padding:20px 30px;background:#f9fafb;border-top:1px solid #e5e7eb;border-radius:0 0 8px 8px;font-size:12px;color:#6b7280;text-align:center;">
-            ' . sprintf( esc_html__( 'You are receiving this email because of an appointment at %s.', 'mitii-booking' ), '<a href="' . esc_url( $site_url ) . '" style="color:#4f46e5;text-decoration:none;">' . esc_html( $site_name ) . '</a>' ) . '
+            ' . $footer_text . '
           </td>
         </tr>
       </table>
@@ -189,7 +195,7 @@ class Mitii_Email {
 </table>
 </body>
 </html>';
-	}
+}
 
 	private static function get_customer_email_template( $booking_id, $customer_name, $details ) {
 		$duration_text = $details['service_duration'] > 0
