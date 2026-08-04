@@ -69,20 +69,45 @@ class Mitii_Bookings_Controller {
         $services_table = $wpdb->prefix . 'mitii_services';
         $staff_table    = $wpdb->prefix . 'mitii_staff';
 
+        $page     = max( 1, intval( $request->get_param( 'page' ) ) ?: 1 );
+        $per_page = intval( $request->get_param( 'per_page' ) ) ?: 20;
+        $per_page = min( 100, max( 1, $per_page ) ); // hard cap so nobody can request an unbounded page size
+        $offset   = ( $page - 1 ) * $per_page;
+
+        $total = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $bookings_table" ) );
+
         $results = $wpdb->get_results(
-            "SELECT b.*, s.name AS service_name, s.price AS service_price, st.name AS staff_name
-             FROM $bookings_table b
-             LEFT JOIN $services_table s ON b.service_id = s.id
-             LEFT JOIN $staff_table st ON b.staff_id = st.id
-             ORDER BY b.id DESC"
+            $wpdb->prepare(
+                "SELECT b.*, s.name AS service_name, s.price AS service_price, st.name AS staff_name
+                 FROM $bookings_table b
+                 LEFT JOIN $services_table s ON b.service_id = s.id
+                 LEFT JOIN $staff_table st ON b.staff_id = st.id
+                 ORDER BY b.id DESC
+                 LIMIT %d OFFSET %d",
+                $per_page,
+                $offset
+            )
         );
 
-        return rest_ensure_response( $results );
+        $response = rest_ensure_response( $results );
+        $response->header( 'X-WP-Total', $total );
+        $response->header( 'X-WP-TotalPages', (int) ceil( $total / $per_page ) );
+
+        return $response;
     }
 
     public static function create_booking( $request ) {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_bookings';
+
+        $client_ip = Mitii_Rate_Limiter::get_client_ip();
+        if ( ! Mitii_Rate_Limiter::check( 'booking_' . $client_ip, 10, 10 * MINUTE_IN_SECONDS ) ) {
+            return new WP_Error(
+                'rate_limited',
+                'Too many booking attempts. Please wait a few minutes and try again.',
+                array( 'status' => 429 )
+            );
+        }
 
         $service_id     = intval( $request['service_id'] );
         $staff_id       = intval( $request['staff_id'] );
@@ -138,6 +163,17 @@ public static function get_my_bookings( $request ) {
         return new WP_Error( 'not_found', 'Customer not found', array( 'status' => 404 ) );
     }
 
+    $page     = max( 1, intval( $request->get_param( 'page' ) ) ?: 1 );
+    $per_page = intval( $request->get_param( 'per_page' ) ) ?: 20;
+    $per_page = min( 100, max( 1, $per_page ) );
+    $offset   = ( $page - 1 ) * $per_page;
+
+    $total = intval(
+        $wpdb->get_var(
+            $wpdb->prepare( "SELECT COUNT(*) FROM $bookings_table WHERE customer_email = %s", $customer->email )
+        )
+    );
+
     $results = $wpdb->get_results(
         $wpdb->prepare(
             "SELECT b.*, s.name AS service_name, s.price AS service_price, st.name AS staff_name
@@ -145,12 +181,19 @@ public static function get_my_bookings( $request ) {
              LEFT JOIN $services_table s ON b.service_id = s.id
              LEFT JOIN $staff_table st ON b.staff_id = st.id
              WHERE b.customer_email = %s
-             ORDER BY b.booking_date DESC, b.booking_time DESC",
-            $customer->email
+             ORDER BY b.booking_date DESC, b.booking_time DESC
+             LIMIT %d OFFSET %d",
+            $customer->email,
+            $per_page,
+            $offset
         )
     );
 
-    return rest_ensure_response( $results );
+    $response = rest_ensure_response( $results );
+    $response->header( 'X-WP-Total', $total );
+    $response->header( 'X-WP-TotalPages', (int) ceil( $total / $per_page ) );
+
+    return $response;
 }
 
 public static function cancel_my_booking( $request ) {

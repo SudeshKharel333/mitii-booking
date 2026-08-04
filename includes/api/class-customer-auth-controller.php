@@ -33,6 +33,15 @@ class Mitii_Customer_Auth_Controller {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_customers';
 
+        $client_ip = Mitii_Rate_Limiter::get_client_ip();
+        if ( ! Mitii_Rate_Limiter::check( 'register_' . $client_ip, 5, HOUR_IN_SECONDS ) ) {
+            return new WP_Error(
+                'rate_limited',
+                'Too many registration attempts. Please try again later.',
+                array( 'status' => 429 )
+            );
+        }
+
         $name     = sanitize_text_field( $request['name'] );
         $email = sanitize_email( strtolower( trim( $request['email'] ) ) );        $password = $request['password'];
 
@@ -76,6 +85,15 @@ class Mitii_Customer_Auth_Controller {
     public static function login_customer( $request ) {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_customers';
+
+        $client_ip = Mitii_Rate_Limiter::get_client_ip();
+        if ( ! Mitii_Rate_Limiter::check( 'login_' . $client_ip, 5, 5 * MINUTE_IN_SECONDS ) ) {
+            return new WP_Error(
+                'rate_limited',
+                'Too many login attempts. Please wait a few minutes and try again.',
+                array( 'status' => 429 )
+            );
+        }
 
         $email = sanitize_email( strtolower( trim( $request['email'] ) ) );        $password = $request['password'];
 
