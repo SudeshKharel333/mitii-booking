@@ -24,6 +24,8 @@ require_once MITII_PLUGIN_DIR . 'includes/api/class-customer-auth-controller.php
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-session.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-rate-limiter.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-staff-first-shortcode.php';
+require_once MITII_PLUGIN_DIR . 'includes/class-mitii-email.php';
+require_once MITII_PLUGIN_DIR . 'includes/class-mitii-session-cleanup.php';
 
 register_activation_hook( __FILE__, array( 'Mitii_Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'Mitii_Deactivator', 'deactivate' ) );
@@ -31,8 +33,14 @@ add_action( Mitii_Session_Cleanup::CRON_HOOK, array( 'Mitii_Session_Cleanup', 'r
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-portal-shortcode.php';
 
 add_action( 'init', array( 'Mitii_Customer_Portal_Shortcode', 'register' ) );
-add_action( 'wp_enqueue_scripts', array( 'Mitii_Customer_Portal_Shortcode', 'enqueue_assets' ) );
+add_action( 'wp_enqueue_scripts', array( 'Miii_Customer_Portal_Shortcode', 'enqueue_assets' ) );
+add_filter( 'wp_mail_from', function( $from ) {
+	return 'bookings@' . parse_url( home_url(), PHP_URL_HOST );
+} );
 
+add_filter( 'wp_mail_from_name', function( $name ) {
+	return get_bloginfo( 'name' ) . ' Bookings';
+} );
 add_action( 'rest_api_init', array( 'Mitii_Customer_Auth_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Services_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Staff_Controller', 'register_routes' ) );

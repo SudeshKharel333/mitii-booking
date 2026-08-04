@@ -10,3 +10,48 @@
 [01-Aug-2026 09:45:50 UTC] Automatic updates complete.
 [02-Aug-2026 09:28:41 UTC] Automatic updates starting...
 [02-Aug-2026 09:28:45 UTC] Automatic updates complete.
+[04-Aug-2026 07:31:30 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func_array(): Argument #1 ($callback) must be a valid callback, class "Miii_Customer_Portal_Shortcode" not found in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php:341
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\script-loader.php(2329): do_action('wp_enqueue_scri...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): wp_enqueue_scripts('')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#5 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#6 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\general-template.php(3208): do_action('wp_head')
+#7 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\template-canvas.php(17): wp_head()
+#8 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\template-loader.php(132): include('C:\\Users\\sudes\\...')
+#9 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(19): require_once('C:\\Users\\sudes\\...')
+#10 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#11 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php on line 341
+[04-Aug-2026 07:31:37 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func_array(): Argument #1 ($callback) must be a valid callback, class "Miii_Customer_Portal_Shortcode" not found in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php:341
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\script-loader.php(2329): do_action('wp_enqueue_scri...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): wp_enqueue_scripts('')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#5 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#6 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\general-template.php(3208): do_action('wp_head')
+#7 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\template-canvas.php(17): wp_head()
+#8 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\template-loader.php(132): include('C:\\Users\\sudes\\...')
+#9 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(19): require_once('C:\\Users\\sudes\\...')
+#10 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#11 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php on line 341
+[04-Aug-2026 07:31:38 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func_array(): Argument #1 ($callback) must be a valid callback, class "Miii_Customer_Portal_Shortcode" not found in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php:341
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\script-loader.php(2329): do_action('wp_enqueue_scri...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): wp_enqueue_scripts('')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#5 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#6 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\general-template.php(3208): do_action('wp_head')
+#7 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\template-canvas.php(17): wp_head()
+#8 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\template-loader.php(132): include('C:\\Users\\sudes\\...')
+#9 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(19): require_once('C:\\Users\\sudes\\...')
+#10 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#11 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php on line 341

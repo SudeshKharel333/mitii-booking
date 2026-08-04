@@ -127,21 +127,47 @@ class Mitii_Bookings_Controller {
         if ( ! Mitii_Availability_Controller::is_slot_available( $staff_id, $booking_date, $service_id, $booking_time ) ) {
             return new WP_Error( 'slot_unavailable', 'That time is no longer available. Please choose another slot.', array( 'status' => 409 ) );
         }
+$wpdb->insert( $table, array(
+	'service_id'     => $service_id,
+	'staff_id'       => $staff_id,
+	'customer_name'  => $customer_name,
+	'customer_email' => $customer_email,
+	'booking_date'   => $booking_date,
+	'booking_time'   => $booking_time,
+	'status'         => 'pending',
+) );
 
-        $wpdb->insert( $table, array(
-            'service_id'      => $service_id,
-            'staff_id'        => $staff_id,
-            'customer_name'   => $customer_name,
-            'customer_email'  => $customer_email,
-            'booking_date'    => $booking_date,
-            'booking_time'    => $booking_time,
-            'status'          => 'pending',
-        ) );
+$booking_id = $wpdb->insert_id;
 
-        return rest_ensure_response( array(
-            'id'      => $wpdb->insert_id,
-            'message' => 'Booking created successfully',
-        ) );
+// ── Send emails ──
+if ( $booking_id ) {
+	Mitii_Email::send_customer_confirmation(
+		$booking_id,
+		$customer_name,
+		$customer_email,
+		$service_id,
+		$staff_id,
+		$booking_date,
+		$booking_time
+	);
+
+	Mitii_Email::send_admin_notification(
+		$booking_id,
+		$customer_name,
+		$customer_email,
+		$service_id,
+		$staff_id,
+		$booking_date,
+		$booking_time
+	);
+}
+
+return rest_ensure_response( array(
+	'id'      => $booking_id,
+	'message' => 'Booking created successfully',
+) );
+
+    
     }
 public static function check_logged_in() {
     return Mitii_Customer_Session::get_current_customer_id() !== null;
@@ -217,9 +243,12 @@ public static function cancel_my_booking( $request ) {
         return new WP_Error( 'forbidden', 'You cannot cancel a booking that is not yours', array( 'status' => 403 ) );
     }
 
-    $wpdb->update( $table, array( 'status' => 'cancelled' ), array( 'id' => $id ) );
+   $wpdb->update( $table, array( 'status' => 'cancelled' ), array( 'id' => $id ) );
 
-    return rest_ensure_response( array( 'id' => $id, 'message' => 'Booking cancelled' ) );
+// ── Notify customer ──
+Mitii_Email::send_cancellation_notice( $booking );
+
+return rest_ensure_response( array( 'id' => $id, 'message' => 'Booking cancelled' ) );
 }
 
 public static function update_booking_status( $request ) {
@@ -238,14 +267,19 @@ public static function update_booking_status( $request ) {
         );
     }
 
-    $booking = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM $table WHERE id = %d", $id ) );
-    if ( ! $booking ) {
-        return new WP_Error( 'not_found', 'Booking not found', array( 'status' => 404 ) );
-    }
+   $booking = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $id ) );
+if ( ! $booking ) {
+	return new WP_Error( 'not_found', 'Booking not found', array( 'status' => 404 ) );
+}
 
-    $wpdb->update( $table, array( 'status' => $status ), array( 'id' => $id ) );
+$wpdb->update( $table, array( 'status' => $status ), array( 'id' => $id ) );
 
-    return rest_ensure_response( array( 'id' => $id, 'status' => $status, 'message' => 'Booking status updated' ) );
+// ── Notify customer if status changed ──
+if ( $booking->status !== $status ) {
+	Mitii_Email::send_status_update( $booking, $status );
+}
+
+return rest_ensure_response( array( 'id' => $id, 'status' => $status, 'message' => 'Booking status updated' ) );
 }
 
 }
