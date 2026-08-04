@@ -22,6 +22,7 @@ require_once MITII_PLUGIN_DIR . 'includes/api/class-bookings-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-shortcode.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-customer-auth-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-session.php';
+require_once MITII_PLUGIN_DIR . 'includes/class-mitii-rate-limiter.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-staff-first-shortcode.php';
 
 register_activation_hook( __FILE__, array( 'Mitii_Activator', 'activate' ) );
