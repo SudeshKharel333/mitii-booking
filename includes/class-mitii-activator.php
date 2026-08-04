@@ -42,7 +42,8 @@ class Mitii_Activator {
             day_of_week TINYINT NOT NULL,
             start_time TIME NOT NULL,
             end_time TIME NOT NULL,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            KEY staff_day (staff_id, day_of_week)
         ) $charset_collate;";
         dbDelta( $sql_availability );
 
@@ -58,7 +59,10 @@ class Mitii_Activator {
             booking_time TIME NOT NULL,
             status VARCHAR(20) NOT NULL DEFAULT 'pending',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            KEY staff_date (staff_id, booking_date),
+            KEY customer_email (customer_email),
+            KEY service_id (service_id)
         ) $charset_collate;";
         dbDelta( $sql_bookings );
 
@@ -73,7 +77,8 @@ $sql_staff_services = "CREATE TABLE $table_staff_services (
     staff_id BIGINT UNSIGNED NOT NULL,
     service_id BIGINT UNSIGNED NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY staff_service_unique (staff_id, service_id)
+    UNIQUE KEY staff_service_unique (staff_id, service_id),
+    KEY service_id (service_id)
 ) $charset_collate;";
 dbDelta( $sql_staff_services );
 
