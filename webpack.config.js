@@ -4,7 +4,7 @@ const path = require( 'path' );
 module.exports = {
     ...defaultConfig,
    entry: {
-  
+      'admin-dashboard': path.resolve( __dirname, 'src/admin/dashboard', 'index.tsx' ),
     'admin-bookings': path.resolve( __dirname, 'src/admin/bookings', 'index.tsx' ),
     'admin-services': path.resolve( __dirname, 'src/admin/services', 'index.tsx' ),
     'admin-staff': path.resolve( __dirname, 'src/admin/staff', 'index.tsx' ),

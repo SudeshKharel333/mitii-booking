@@ -36,9 +36,25 @@ class Mitii_Customer_Portal_Shortcode {
             );
         }
 
+        wp_localize_script( 'mitii-customer-portal', 'mitiiPortalData', array(
+            'serviceBookingUrl' => self::find_page_url_for_shortcode( 'mitii_booking' ),
+            'staffBookingUrl'   => self::find_page_url_for_shortcode( 'mitii_booking_by_staff' ),
+        ) );
+    }
 
+    private static function find_page_url_for_shortcode( $shortcode ) {
+        $pages = get_posts( array(
+            'post_type'   => 'page',
+            'post_status' => 'publish',
+            'numberposts' => -1,
+        ) );
 
+        foreach ( $pages as $page ) {
+            if ( has_shortcode( $page->post_content, $shortcode ) ) {
+                return get_permalink( $page->ID );
+            }
+        }
 
-
+        return '';
     }
 }

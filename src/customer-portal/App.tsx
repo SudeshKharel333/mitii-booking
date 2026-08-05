@@ -43,6 +43,9 @@ export default function App() {
         } ).then( () => checkLoginStatus() );
     };
 
+    const serviceBookingUrl = ( window as any ).mitiiPortalData?.serviceBookingUrl || '';
+    const staffBookingUrl = ( window as any ).mitiiPortalData?.staffBookingUrl || '';
+
     if ( loading ) {
         return (
             <div className="mitii-portal-ticket">
@@ -113,6 +116,24 @@ export default function App() {
                     Profile
                 </button>
             </div>
+
+            { ( serviceBookingUrl || staffBookingUrl ) && (
+                <div className="mitii-portal-new-booking">
+                    <p className="mitii-portal-section-title">Book Another Appointment</p>
+                    <div className="mitii-portal-new-booking-actions">
+                        { serviceBookingUrl && (
+                            <a href={ serviceBookingUrl } className="mitii-portal-btn-outline">
+                                Choose a Service
+                            </a>
+                        ) }
+                        { staffBookingUrl && (
+                            <a href={ staffBookingUrl } className="mitii-portal-btn-outline">
+                                Choose a Staff Member
+                            </a>
+                        ) }
+                    </div>
+                </div>
+            ) }
 
             <div className="mitii-portal-ticket-body">
                 { tab === 'bookings' ? (

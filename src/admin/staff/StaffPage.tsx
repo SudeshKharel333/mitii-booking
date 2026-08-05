@@ -32,7 +32,24 @@ const DAY_NAMES = [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fri
 
 const emptyWeek = (): DaySchedule[] =>
     DAY_NAMES.map( () => ( { enabled: false, start: '09:00', end: '18:00' } ) );
-
+function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' | 'staff' } ) {
+    return (
+        <div className="mitii-nav-pills">
+            <a href="admin.php?page=mitii-dashboard" className={ `mitii-nav-pill${ active === 'dashboard' ? ' is-active' : '' }` }>
+                Dashboard
+            </a>
+            <a href="admin.php?page=mitii-bookings" className={ `mitii-nav-pill${ active === 'bookings' ? ' is-active' : '' }` }>
+                Bookings
+            </a>
+            <a href="admin.php?page=mitii-services" className={ `mitii-nav-pill${ active === 'services' ? ' is-active' : '' }` }>
+                Services
+            </a>
+            <a href="admin.php?page=mitii-staff" className={ `mitii-nav-pill${ active === 'staff' ? ' is-active' : '' }` }>
+                Staff
+            </a>
+        </div>
+    );
+}
 declare global {
     interface Window {
         wp: any;

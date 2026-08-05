@@ -18,9 +18,12 @@ type Booking = {
 
 const PER_PAGE = 20;
 
-function NavPills( { active }: { active: 'bookings' | 'services' | 'staff' } ) {
+function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' | 'staff' } ) {
     return (
         <div className="mitii-nav-pills">
+            <a href="admin.php?page=mitii-dashboard" className={ `mitii-nav-pill${ active === 'dashboard' ? ' is-active' : '' }` }>
+                Dashboard
+            </a>
             <a href="admin.php?page=mitii-bookings" className={ `mitii-nav-pill${ active === 'bookings' ? ' is-active' : '' }` }>
                 Bookings
             </a>

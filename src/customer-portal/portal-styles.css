@@ -354,6 +354,37 @@
   border-bottom-color: var(--mitii-teal);
 }
 
+/* ---- New-booking shortcuts (links to the service/staff booking pages) ---- */
+.mitii-portal-new-booking {
+  padding: 18px 26px 0;
+  background: var(--mitii-paper);
+}
+
+.mitii-portal-new-booking-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mitii-portal-btn-outline {
+  display: inline-block;
+  background: #fff;
+  color: var(--mitii-teal-dark);
+  border: 1px solid var(--mitii-teal);
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.mitii-portal-btn-outline:hover {
+  background: var(--mitii-teal);
+  color: #fff;
+  box-shadow: var(--elevation-1);
+}
+
 /* ---- Inline success message (mirrors .mitii-portal-error) ---- */
 .mitii-portal-success {
   color: var(--mitii-teal-dark);
