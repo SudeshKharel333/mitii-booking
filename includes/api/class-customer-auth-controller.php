@@ -27,6 +27,22 @@ class Mitii_Customer_Auth_Controller {
             'callback'            => array( __CLASS__, 'get_current_customer' ),
             'permission_callback' => '__return_true',
         ) );
+
+        register_rest_route( 'mitii/v1', '/customer/me', array(
+            'methods'             => 'PUT',
+            'callback'            => array( __CLASS__, 'update_current_customer' ),
+            'permission_callback' => array( __CLASS__, 'check_logged_in' ),
+        ) );
+
+        register_rest_route( 'mitii/v1', '/customer/me', array(
+            'methods'             => 'DELETE',
+            'callback'            => array( __CLASS__, 'delete_current_customer' ),
+            'permission_callback' => array( __CLASS__, 'check_logged_in' ),
+        ) );
+    }
+
+    public static function check_logged_in() {
+        return Mitii_Customer_Session::get_current_customer_id() !== null;
     }
 
     public static function register_customer( $request ) {
@@ -146,5 +162,91 @@ class Mitii_Customer_Auth_Controller {
             'name'      => $customer->name,
             'email'     => $customer->email,
         ) );
+    }
+
+    public static function update_current_customer( $request ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mitii_customers';
+        $customer_id = Mitii_Customer_Session::get_current_customer_id();
+
+        $customer = $wpdb->get_row(
+            $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $customer_id )
+        );
+        if ( ! $customer ) {
+            return new WP_Error( 'not_found', 'Account not found', array( 'status' => 404 ) );
+        }
+
+        $name  = sanitize_text_field( $request['name'] );
+        $email = sanitize_email( strtolower( trim( $request['email'] ) ) );
+
+        if ( empty( $name ) || empty( $email ) ) {
+            return new WP_Error( 'missing_fields', 'Name and email are both required', array( 'status' => 400 ) );
+        }
+
+        if ( ! is_email( $email ) ) {
+            return new WP_Error( 'invalid_email', 'Please enter a valid email address', array( 'status' => 400 ) );
+        }
+
+        $existing = $wpdb->get_row(
+            $wpdb->prepare( "SELECT id FROM $table WHERE email = %s AND id != %d", $email, $customer_id )
+        );
+        if ( $existing ) {
+            return new WP_Error( 'email_taken', 'An account with this email already exists', array( 'status' => 400 ) );
+        }
+
+        $update_data   = array( 'name' => $name, 'email' => $email );
+        $update_format = array( '%s', '%s' );
+
+        $new_password = isset( $request['new_password'] ) ? $request['new_password'] : '';
+        if ( ! empty( $new_password ) ) {
+            $current_password = isset( $request['current_password'] ) ? $request['current_password'] : '';
+
+            if ( empty( $current_password ) || ! wp_check_password( $current_password, $customer->password_hash ) ) {
+                return new WP_Error( 'invalid_password', 'Your current password is incorrect', array( 'status' => 401 ) );
+            }
+
+            if ( strlen( $new_password ) < 8 ) {
+                return new WP_Error( 'weak_password', 'New password must be at least 8 characters', array( 'status' => 400 ) );
+            }
+
+            $update_data['password_hash'] = wp_hash_password( $new_password );
+            $update_format[]              = '%s';
+        }
+
+        $wpdb->update( $table, $update_data, array( 'id' => $customer_id ), $update_format, array( '%d' ) );
+
+        return rest_ensure_response( array(
+            'id'    => $customer_id,
+            'name'  => $name,
+            'email' => $email,
+        ) );
+    }
+
+    public static function delete_current_customer( $request ) {
+        global $wpdb;
+        $table          = $wpdb->prefix . 'mitii_customers';
+        $sessions_table = $wpdb->prefix . 'mitii_customer_sessions';
+        $customer_id    = Mitii_Customer_Session::get_current_customer_id();
+
+        $customer = $wpdb->get_row(
+            $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $customer_id )
+        );
+        if ( ! $customer ) {
+            return new WP_Error( 'not_found', 'Account not found', array( 'status' => 404 ) );
+        }
+
+        $password = isset( $request['password'] ) ? $request['password'] : '';
+        if ( empty( $password ) || ! wp_check_password( $password, $customer->password_hash ) ) {
+            return new WP_Error( 'invalid_password', 'Your password is incorrect', array( 'status' => 401 ) );
+        }
+
+        // Booking history stays intact (it's tied to the email, not this row) — only the
+        // account and its sessions are removed.
+        $wpdb->delete( $sessions_table, array( 'customer_id' => $customer_id ) );
+        $wpdb->delete( $table, array( 'id' => $customer_id ) );
+
+        Mitii_Customer_Session::destroy_session();
+
+        return rest_ensure_response( array( 'message' => 'Account deleted' ) );
     }
 }

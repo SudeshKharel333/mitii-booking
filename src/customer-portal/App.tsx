@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import BookingsList from './BookingsList';
+import ProfileForm from './ProfileForm';
 // @ts-ignore: side-effect import for stylesheet without type declarations
 import './portal-styles.css';
 type CurrentUser = {
@@ -14,6 +15,7 @@ type CurrentUser = {
 export default function App() {
     const [ user, setUser ] = useState<CurrentUser | null>( null );
     const [ mode, setMode ] = useState<'login' | 'register'>( 'login' );
+    const [ tab, setTab ] = useState<'bookings' | 'profile'>( 'bookings' );
     const [ loading, setLoading ] = useState( true );
     const [ loadError, setLoadError ] = useState( '' );
 
@@ -87,30 +89,41 @@ export default function App() {
 
     return (
         <div className="mitii-portal-ticket" style={ { maxWidth: '640px' } }>
-            <div className="mitii-portal-ticket-header" style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' } }>
+            <div className="mitii-portal-ticket-header mitii-portal-ticket-header-row">
                 <div>
                     <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
                     <h2 className="mitii-portal-ticket-title">{ user.name }</h2>
                 </div>
-                <button
-    onClick={ handleLogout }
-    style={ {
-        background: '#e53e3e', // Bright red background to test visibility
-        color: '#ffffff',
-        border: 'none',
-        padding: '8px 16px',
-        borderRadius: '20px',
-        fontSize: '13px',
-        fontWeight: 600,
-        cursor: 'pointer',
-        zIndex: 9999,
-    } }
->
-    Log out
-</button>
+                <button className="mitii-portal-logout" onClick={ handleLogout }>
+                    Log out
+                </button>
             </div>
+
+            <div className="mitii-portal-tabs">
+                <button
+                    className={ `mitii-portal-tab${ tab === 'bookings' ? ' is-active' : '' }` }
+                    onClick={ () => setTab( 'bookings' ) }
+                >
+                    My Bookings
+                </button>
+                <button
+                    className={ `mitii-portal-tab${ tab === 'profile' ? ' is-active' : '' }` }
+                    onClick={ () => setTab( 'profile' ) }
+                >
+                    Profile
+                </button>
+            </div>
+
             <div className="mitii-portal-ticket-body">
-                <BookingsList onChanged={ checkLoginStatus } />
+                { tab === 'bookings' ? (
+                    <BookingsList onChanged={ checkLoginStatus } />
+                ) : (
+                    <ProfileForm
+                        user={ user }
+                        onUpdated={ checkLoginStatus }
+                        onAccountDeleted={ checkLoginStatus }
+                    />
+                ) }
             </div>
         </div>
     );

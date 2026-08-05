@@ -90,6 +90,10 @@
   margin-bottom: 26px;
 }
 
+.mitii-stat-single {
+  margin-bottom: 26px;
+}
+
 .mitii-stat-card {
   background: #fff;
   border-radius: 16px;
@@ -314,4 +318,109 @@
 
 .mitii-portal-ticket-body {
   padding: 30px 26px 26px;
+}
+
+.mitii-portal-ticket-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+/* ---- Tabs (Bookings / Profile) ---- */
+.mitii-portal-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 14px 26px 0;
+  background: var(--mitii-paper);
+}
+
+.mitii-portal-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mitii-ink-soft);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.mitii-portal-tab:hover { color: var(--mitii-teal-dark); }
+
+.mitii-portal-tab.is-active {
+  color: var(--mitii-teal-dark);
+  border-bottom-color: var(--mitii-teal);
+}
+
+/* ---- Inline success message (mirrors .mitii-portal-error) ---- */
+.mitii-portal-success {
+  color: var(--mitii-teal-dark);
+  font-size: 13px;
+  margin: -4px 0 12px;
+}
+
+.mitii-portal-btn-text-neutral {
+  color: var(--mitii-teal);
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+/* ---- Danger zone (profile: delete account) ---- */
+.mitii-portal-danger-zone {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--mitii-border);
+}
+
+.mitii-portal-danger-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mitii-danger);
+  margin: 0 0 8px;
+}
+
+.mitii-portal-danger-copy {
+  font-size: 13px;
+  color: var(--mitii-ink-soft);
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+
+.mitii-portal-btn-danger-outline {
+  background: none;
+  border: 1px solid var(--mitii-danger);
+  color: var(--mitii-danger);
+  padding: 10px 18px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.mitii-portal-btn-danger-outline:hover { background: var(--mitii-danger); color: #fff; }
+
+.mitii-portal-btn-danger {
+  background: var(--mitii-danger);
+  color: #fff;
+  border: none;
+  padding: 11px 20px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--elevation-1);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+.mitii-portal-btn-danger:hover { background: #9c3d3d; box-shadow: var(--elevation-2); }
+.mitii-portal-btn-danger:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+
+.mitii-portal-danger-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
 }
