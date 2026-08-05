@@ -216,3 +216,99 @@ Stack trace:
 #3 C:\Users\sudes\Local Sites\mitii\app\public\wp-cron.php(46): require_once('C:\\Users\\sudes\\...')
 #4 {main}
   thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[05-Aug-2026 04:59:50 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func(): Argument #1 ($callback) must be a valid callback, class Mitii_Customer_Auth_Controller does not have a method "check_logged_in" in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php:892
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_send_allow_header(Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(205): WP_Hook->apply_filters(Object(WP_REST_Response), Array)
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api\class-wp-rest-server.php(464): apply_filters('rest_post_dispa...', Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php(480): WP_REST_Server->serve_request('/mitii/v1/custo...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_api_loaded(Object(WP))
+#5 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#6 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(570): WP_Hook->do_action(Array)
+#7 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(418): do_action_ref_array('parse_request', Array)
+#8 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(821): WP->parse_request('')
+#9 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\functions.php(1343): WP->main('')
+#10 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(16): wp()
+#11 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#12 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php on line 892
+[05-Aug-2026 05:00:09 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func(): Argument #1 ($callback) must be a valid callback, class Mitii_Customer_Auth_Controller does not have a method "check_logged_in" in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php:892
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_send_allow_header(Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(205): WP_Hook->apply_filters(Object(WP_REST_Response), Array)
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api\class-wp-rest-server.php(464): apply_filters('rest_post_dispa...', Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php(480): WP_REST_Server->serve_request('/mitii/v1/custo...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_api_loaded(Object(WP))
+#5 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#6 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(570): WP_Hook->do_action(Array)
+#7 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(418): do_action_ref_array('parse_request', Array)
+#8 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(821): WP->parse_request('')
+#9 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\functions.php(1343): WP->main('')
+#10 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(16): wp()
+#11 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#12 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php on line 892
+[05-Aug-2026 05:00:10 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func(): Argument #1 ($callback) must be a valid callback, class Mitii_Customer_Auth_Controller does not have a method "check_logged_in" in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php:892
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_send_allow_header(Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(205): WP_Hook->apply_filters(Object(WP_REST_Response), Array)
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api\class-wp-rest-server.php(464): apply_filters('rest_post_dispa...', Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php(480): WP_REST_Server->serve_request('/mitii/v1/custo...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_api_loaded(Object(WP))
+#5 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#6 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(570): WP_Hook->do_action(Array)
+#7 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(418): do_action_ref_array('parse_request', Array)
+#8 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(821): WP->parse_request('')
+#9 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\functions.php(1343): WP->main('')
+#10 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(16): wp()
+#11 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#12 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php on line 892
+[05-Aug-2026 05:12:06 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func(): Argument #1 ($callback) must be a valid callback, class Mitii_Customer_Auth_Controller does not have a method "check_logged_in" in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php:892
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_send_allow_header(Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(205): WP_Hook->apply_filters(Object(WP_REST_Response), Array)
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api\class-wp-rest-server.php(464): apply_filters('rest_post_dispa...', Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php(480): WP_REST_Server->serve_request('/mitii/v1/custo...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_api_loaded(Object(WP))
+#5 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#6 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(570): WP_Hook->do_action(Array)
+#7 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(418): do_action_ref_array('parse_request', Array)
+#8 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(821): WP->parse_request('')
+#9 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\functions.php(1343): WP->main('')
+#10 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(16): wp()
+#11 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#12 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php on line 892
+[05-Aug-2026 05:12:24 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func(): Argument #1 ($callback) must be a valid callback, class Mitii_Customer_Auth_Controller does not have a method "check_logged_in" in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php:892
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_send_allow_header(Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(205): WP_Hook->apply_filters(Object(WP_REST_Response), Array)
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api\class-wp-rest-server.php(464): apply_filters('rest_post_dispa...', Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php(480): WP_REST_Server->serve_request('/mitii/v1/custo...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_api_loaded(Object(WP))
+#5 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#6 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(570): WP_Hook->do_action(Array)
+#7 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(418): do_action_ref_array('parse_request', Array)
+#8 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(821): WP->parse_request('')
+#9 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\functions.php(1343): WP->main('')
+#10 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(16): wp()
+#11 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#12 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php on line 892
+[05-Aug-2026 05:13:20 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func(): Argument #1 ($callback) must be a valid callback, class Mitii_Customer_Auth_Controller does not have a method "check_logged_in" in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php:892
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_send_allow_header(Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(205): WP_Hook->apply_filters(Object(WP_REST_Response), Array)
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api\class-wp-rest-server.php(464): apply_filters('rest_post_dispa...', Object(WP_REST_Response), Object(WP_REST_Server), Object(WP_REST_Request))
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php(480): WP_REST_Server->serve_request('/mitii/v1/custo...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(341): rest_api_loaded(Object(WP))
+#5 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters('', Array)
+#6 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\plugin.php(570): WP_Hook->do_action(Array)
+#7 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(418): do_action_ref_array('parse_request', Array)
+#8 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp.php(821): WP->parse_request('')
+#9 C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\functions.php(1343): WP->main('')
+#10 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(16): wp()
+#11 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#12 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\rest-api.php on line 892

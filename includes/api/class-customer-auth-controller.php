@@ -27,6 +27,25 @@ class Mitii_Customer_Auth_Controller {
             'callback'            => array( __CLASS__, 'get_current_customer' ),
             'permission_callback' => '__return_true',
         ) );
+        register_rest_route( 'mitii/v1', '/customer/me', array(
+			'methods'             => 'GET',
+			'callback'            => array( __CLASS__, 'get_current_customer' ),
+			'permission_callback' => '__return_true',
+		) );
+
+		// NEW: Update profile
+		register_rest_route( 'mitii/v1', '/customer/me', array(
+			'methods'             => 'PUT',
+			'callback'            => array( __CLASS__, 'update_customer' ),
+			'permission_callback' => array( __CLASS__, 'check_logged_in' ),
+		) );
+
+		// NEW: Delete account
+		register_rest_route( 'mitii/v1', '/customer/me', array(
+			'methods'             => 'DELETE',
+			'callback'            => array( __CLASS__, 'delete_customer' ),
+			'permission_callback' => array( __CLASS__, 'check_logged_in' ),
+		) );
     }
 
     public static function register_customer( $request ) {
@@ -147,4 +166,104 @@ class Mitii_Customer_Auth_Controller {
             'email'     => $customer->email,
         ) );
     }
+    
+	/**
+	 * Update current customer's profile.
+	 */
+	public static function update_customer( $request ) {
+		global $wpdb;
+		$table       = $wpdb->prefix . 'mitii_customers';
+		$customer_id = Mitii_Customer_Session::get_current_customer_id();
+
+		$name     = isset( $request['name'] ) ? sanitize_text_field( $request['name'] ) : null;
+		$email    = isset( $request['email'] ) ? sanitize_email( strtolower( trim( $request['email'] ) ) ) : null;
+		$password = isset( $request['password'] ) ? $request['password'] : null;
+
+		$current = $wpdb->get_row(
+			$wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $customer_id )
+		);
+
+		if ( ! $current ) {
+			return new WP_Error( 'not_found', 'Customer not found', array( 'status' => 404 ) );
+		}
+
+		$update_data = array();
+
+		if ( ! empty( $name ) ) {
+			$update_data['name'] = $name;
+		}
+
+		if ( ! empty( $email ) && $email !== $current->email ) {
+			if ( ! is_email( $email ) ) {
+				return new WP_Error( 'invalid_email', 'Please enter a valid email address', array( 'status' => 400 ) );
+			}
+
+			$existing = $wpdb->get_row(
+				$wpdb->prepare( "SELECT id FROM $table WHERE email = %s AND id != %d", $email, $customer_id )
+			);
+			if ( $existing ) {
+				return new WP_Error( 'email_taken', 'An account with this email already exists', array( 'status' => 400 ) );
+			}
+
+			$update_data['email'] = $email;
+		}
+
+		if ( ! empty( $password ) ) {
+			if ( strlen( $password ) < 8 ) {
+				return new WP_Error( 'weak_password', 'Password must be at least 8 characters', array( 'status' => 400 ) );
+			}
+			$update_data['password_hash'] = wp_hash_password( $password );
+		}
+
+		if ( empty( $update_data ) ) {
+			return new WP_Error( 'no_changes', 'No fields to update', array( 'status' => 400 ) );
+		}
+
+		$wpdb->update( $table, $update_data, array( 'id' => $customer_id ) );
+
+		return rest_ensure_response( array(
+			'id'      => $customer_id,
+			'message' => 'Profile updated successfully',
+		) );
+	}
+
+	/**
+	 * Delete current customer's account and all associated data.
+	 */
+	public static function delete_customer( $request ) {
+		global $wpdb;
+		$customers_table = $wpdb->prefix . 'mitii_customers';
+		$sessions_table  = $wpdb->prefix . 'mitii_customer_sessions';
+		$bookings_table  = $wpdb->prefix . 'mitii_bookings';
+		$customer_id     = Mitii_Customer_Session::get_current_customer_id();
+
+		// Get customer email to anonymize bookings
+		$customer = $wpdb->get_row(
+			$wpdb->prepare( "SELECT email FROM $customers_table WHERE id = %d", $customer_id )
+		);
+
+		if ( ! $customer ) {
+			return new WP_Error( 'not_found', 'Customer not found', array( 'status' => 404 ) );
+		}
+
+		// Anonymize past bookings (keep them for records but remove personal link)
+		$wpdb->update(
+			$bookings_table,
+			array( 'customer_email' => 'deleted@account.local' ),
+			array( 'customer_email' => $customer->email )
+		);
+
+		// Delete all sessions for this customer
+		$wpdb->delete( $sessions_table, array( 'customer_id' => $customer_id ) );
+
+		// Delete the customer
+		$wpdb->delete( $customers_table, array( 'id' => $customer_id ) );
+
+		// Clear the session cookie
+		Mitii_Customer_Session::destroy_session();
+
+		return rest_ensure_response( array(
+			'message' => 'Account deleted successfully',
+		) );
+	}
 }
