@@ -55,3 +55,164 @@ Stack trace:
 #10 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
 #11 {main}
   thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-includes\class-wp-hook.php on line 341
+[04-Aug-2026 11:22:57 UTC] Automatic updates starting...
+[04-Aug-2026 11:22:58 UTC] Automatic updates complete.
+[04-Aug-2026 11:44:56 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\includes\class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:44:56 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\includes\class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-admin\admin-ajax.php(22): require_once('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:45:56 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:45:56 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-admin\admin-ajax.php(22): require_once('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:47:13 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:47:13 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-admin\admin-ajax.php(22): require_once('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:47:15 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:47:15 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-admin\admin.php(35): require_once('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:47:15 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:47:15 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(13): require_once('C:\\Users\\sudes\\...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#5 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:56:07 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:56:07 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-admin\admin.php(35): require_once('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:56:07 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 11:56:07 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(13): require_once('C:\\Users\\sudes\\...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#5 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:09:56 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:09:56 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(13): require_once('C:\\Users\\sudes\\...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#5 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:09:56 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:09:56 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(13): require_once('C:\\Users\\sudes\\...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#5 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:09:58 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:09:58 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(13): require_once('C:\\Users\\sudes\\...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#5 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:09:58 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:09:58 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-blog-header.php(13): require_once('C:\\Users\\sudes\\...')
+#4 C:\Users\sudes\Local Sites\mitii\app\public\index.php(17): require('C:\\Users\\sudes\\...')
+#5 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:09:58 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:09:58 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-admin\admin-ajax.php(22): require_once('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:10:58 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:10:58 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-admin\admin-ajax.php(22): require_once('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:13:00 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:13:00 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-admin\admin-ajax.php(22): require_once('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:13:26 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:13:26 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-login.php(12): require('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:13:26 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:13:26 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-cron.php(46): require_once('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:14:29 UTC] PHP Warning:  require_once(C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php): Failed to open stream: No such file or directory in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
+[04-Aug-2026 12:14:29 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking/includes/class-mitii-email.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php:29
+Stack trace:
+#0 C:\Users\sudes\Local Sites\mitii\app\public\wp-settings.php(589): include_once()
+#1 C:\Users\sudes\Local Sites\mitii\app\public\wp-config.php(108): require_once('C:\\Users\\sudes\\...')
+#2 C:\Users\sudes\Local Sites\mitii\app\public\wp-load.php(50): require_once('C:\\Users\\sudes\\...')
+#3 C:\Users\sudes\Local Sites\mitii\app\public\wp-cron.php(46): require_once('C:\\Users\\sudes\\...')
+#4 {main}
+  thrown in C:\Users\sudes\Local Sites\mitii\app\public\wp-content\plugins\mitii-booking\mitii-booking.php on line 29
