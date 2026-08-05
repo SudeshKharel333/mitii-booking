@@ -24,6 +24,8 @@ require_once MITII_PLUGIN_DIR . 'includes/api/class-customer-auth-controller.php
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-session.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-rate-limiter.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-staff-first-shortcode.php';
+require_once MITII_PLUGIN_DIR . 'includes/class-mitii-page-template.php';
+require_once MITII_PLUGIN_DIR . 'includes/class-mitii-clean-mode.php';
 
 register_activation_hook( __FILE__, array( 'Mitii_Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'Mitii_Deactivator', 'deactivate' ) );
@@ -43,4 +45,6 @@ add_action( 'init', array( 'Mitii_Shortcode', 'register' ) );
 add_action( 'wp_enqueue_scripts', array( 'Mitii_Shortcode', 'enqueue_assets' ) );
 add_action( 'init', array( 'Mitii_Staff_First_Shortcode', 'register' ) );
 add_action( 'wp_enqueue_scripts', array( 'Mitii_Staff_First_Shortcode', 'enqueue_assets' ) );
+add_action( 'init', array( 'Mitii_Page_Template', 'register' ) );
+add_action( 'init', array( 'Mitii_Clean_Mode', 'register' ) );
 add_action( 'rest_api_init', array( 'Mitii_Availability_Controller', 'register_routes' ) );
