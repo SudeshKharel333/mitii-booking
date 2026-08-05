@@ -1,124 +1,117 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import BookingsList from './BookingsList';
-import Profile from './profile';
-
-interface Customer {
-	id: number;
-	name: string;
-	email: string;
-}
-
-const App: React.FC = () => {
-	const [customer, setCustomer] = useState<Customer | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [showRegister, setShowRegister] = useState(false);
-	const [activeTab, setActiveTab] = useState<'bookings' | 'profile'>('bookings');
-
-	const checkAuth = async () => {
-		try {
-			const res = await fetch('/wp-json/mitii/v1/customer/me', {
-				credentials: 'include',
-			});
-			const data = await res.json();
-			if (data.logged_in) {
-				setCustomer({ id: data.id, name: data.name, email: data.email });
-			} else {
-				setCustomer(null);
-			}
-		} catch {
-			setCustomer(null);
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		checkAuth();
-	}, []);
-
-	const handleLogin = (user: Customer) => {
-		setCustomer(user);
-		setShowRegister(false);
-	};
-
-	const handleLogout = async () => {
-		await fetch('/wp-json/mitii/v1/customer/logout', {
-			method: 'POST',
-			credentials: 'include',
-		});
-		setCustomer(null);
-		setActiveTab('bookings');
-	};
-
-	if (loading) {
-		return <div className="mitii-portal-loading">Loading...</div>;
-	}
-
-	if (!customer) {
-		return (
-			<div className="mitii-portal-auth">
-				{showRegister ? (
-					<>
-						<RegisterForm onRegister={handleLogin} />
-						<p className="mitii-auth-switch">
-							Already have an account?{' '}
-							<button onClick={() => setShowRegister(false)}>Log in</button>
-						</p>
-					</>
-				) : (
-					<>
-						<LoginForm onLogin={handleLogin} />
-						<p className="mitii-auth-switch">
-							Don't have an account?{' '}
-							<button onClick={() => setShowRegister(true)}>Register</button>
-						</p>
-					</>
-				)}
-			</div>
-		);
-	}
-
-	return (
-		<div className="mitii-portal-dashboard">
-			<div className="mitii-portal-header">
-				<div className="mitii-welcome">
-					<h2>Welcome, {customer.name}</h2>
-					<p>{customer.email}</p>
-				</div>
-				<button className="mitii-btn mitii-btn-secondary" onClick={handleLogout}>
-					Logout
-				</button>
-			</div>
-
-			<div className="mitii-portal-tabs">
-				<button
-					className={`mitii-tab ${activeTab === 'bookings' ? 'mitii-tab-active' : ''}`}
-					onClick={() => setActiveTab('bookings')}
-				>
-					My Bookings
-				</button>
-				<button
-					className={`mitii-tab ${activeTab === 'profile' ? 'mitii-tab-active' : ''}`}
-					onClick={() => setActiveTab('profile')}
-				>
-					Profile
-				</button>
-			</div>
-
-			<div className="mitii-portal-content">
-				{activeTab === 'bookings' && <BookingsList />}
-				{activeTab === 'profile' && (
-					<Profile
-						customer={customer}
-						onUpdate={checkAuth}
-						onLogout={handleLogout}
-					/>
-				)}
-			</div>
-		</div>
-	);
+// @ts-ignore: side-effect import for stylesheet without type declarations
+import './portal-styles.css';
+type CurrentUser = {
+    logged_in: boolean;
+    id?: number;
+    name?: string;
+    email?: string;
 };
 
-export default App;
+export default function App() {
+    const [ user, setUser ] = useState<CurrentUser | null>( null );
+    const [ mode, setMode ] = useState<'login' | 'register'>( 'login' );
+    const [ loading, setLoading ] = useState( true );
+    const [ loadError, setLoadError ] = useState( '' );
+
+    const checkLoginStatus = () => {
+        fetch( '/wp-json/mitii/v1/customer/me', { credentials: 'same-origin' } )
+            .then( ( res ) => res.json() )
+            .then( ( data ) => {
+                setUser( data );
+                setLoading( false );
+            } )
+            .catch( () => {
+                setLoadError( 'Could not connect to the server. Please refresh the page.' );
+                setLoading( false );
+            } );
+    };
+
+    useEffect( () => {
+        checkLoginStatus();
+    }, [] );
+
+    const handleLogout = () => {
+        fetch( '/wp-json/mitii/v1/customer/logout', {
+            method: 'POST',
+            credentials: 'same-origin',
+        } ).then( () => checkLoginStatus() );
+    };
+
+    if ( loading ) {
+        return (
+            <div className="mitii-portal-ticket">
+                <div className="mitii-portal-ticket-header">
+                    <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
+                    <h2 className="mitii-portal-ticket-title">Your Account</h2>
+                </div>
+                <div className="mitii-portal-ticket-body">Loading...</div>
+            </div>
+        );
+    }
+
+    if ( loadError ) {
+        return (
+            <div className="mitii-portal-ticket">
+                <div className="mitii-portal-ticket-header">
+                    <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
+                    <h2 className="mitii-portal-ticket-title">Your Account</h2>
+                </div>
+                <div className="mitii-portal-ticket-body">{ loadError }</div>
+            </div>
+        );
+    }
+
+    if ( ! user?.logged_in ) {
+        return (
+            <div className="mitii-portal-ticket">
+                <div className="mitii-portal-ticket-header">
+                    <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
+                    <h2 className="mitii-portal-ticket-title">
+                        { mode === 'login' ? 'Log In' : 'Create Account' }
+                    </h2>
+                </div>
+                <div className="mitii-portal-ticket-body">
+                    { mode === 'login' ? (
+                        <LoginForm onSuccess={ checkLoginStatus } onSwitchToRegister={ () => setMode( 'register' ) } />
+                    ) : (
+                        <RegisterForm onSuccess={ checkLoginStatus } onSwitchToLogin={ () => setMode( 'login' ) } />
+                    ) }
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="mitii-portal-ticket" style={ { maxWidth: '640px' } }>
+            <div className="mitii-portal-ticket-header" style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' } }>
+                <div>
+                    <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
+                    <h2 className="mitii-portal-ticket-title">{ user.name }</h2>
+                </div>
+                <button
+    onClick={ handleLogout }
+    style={ {
+        background: '#e53e3e', // Bright red background to test visibility
+        color: '#ffffff',
+        border: 'none',
+        padding: '8px 16px',
+        borderRadius: '20px',
+        fontSize: '13px',
+        fontWeight: 600,
+        cursor: 'pointer',
+        zIndex: 9999,
+    } }
+>
+    Log out
+</button>
+            </div>
+            <div className="mitii-portal-ticket-body">
+                <BookingsList onChanged={ checkLoginStatus } />
+            </div>
+        </div>
+    );
+}
