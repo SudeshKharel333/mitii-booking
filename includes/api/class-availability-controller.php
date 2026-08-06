@@ -28,7 +28,7 @@ class Mitii_Availability_Controller {
     public static function check_admin_permission() {
         return  function( WP_REST_Request $request ) {
             // 1. Check capability
-            if ( ! current_user_can( 'manage_options' ) ) {
+            if ( ! current_user_can( 'manage_mitii_bookings' ) ) {
                 return new WP_Error( 
                     'rest_forbidden', 
                     __( 'You do not have permission to view bookings.' ), 

@@ -36,7 +36,7 @@ class Mitii_Staff_Controller {
     }
 
     public static function check_admin_permission() {
-        return current_user_can( 'manage_options' );
+        return current_user_can( 'manage_mitii_bookings' );
     }
 
     // ---- Helper: get the list of service_ids assigned to one staff member ----

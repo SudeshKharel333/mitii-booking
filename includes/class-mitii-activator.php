@@ -112,11 +112,13 @@ dbDelta( $sql_sessions );
 
 
 
-// ---- Register the custom customer role ----
-if ( ! get_role( 'mitii_customer' ) ) {
-    add_role( 'mitii_customer', 'Mitii Customer', array(
-        'read' => true, // allows them to log in and view their own profile/dashboard
-    ) );
+// ---- Grant the admin-panel capability to Administrators ----
+// Controllers check current_user_can( 'manage_mitii_bookings' ) instead of the
+// blanket 'manage_options', so a future "Booking Manager" role could be added
+// without touching any controller code.
+$admin_role = get_role( 'administrator' );
+if ( $admin_role && ! $admin_role->has_cap( 'manage_mitii_bookings' ) ) {
+    $admin_role->add_cap( 'manage_mitii_bookings' );
 }
 
 // ---- Schedule the daily cleanup of expired customer sessions ----

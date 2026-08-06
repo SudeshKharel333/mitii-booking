@@ -39,7 +39,7 @@ register_rest_route( 'mitii/v1', '/staff/(?P<staff_id>\d+)/services', array(
     }
 
     public static function check_admin_permission() {
-        return current_user_can( 'manage_options' );
+        return current_user_can( 'manage_mitii_bookings' );
     }
 
     public static function get_services( $request ) {

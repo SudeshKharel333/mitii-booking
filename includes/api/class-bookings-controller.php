@@ -9,7 +9,7 @@ class Mitii_Bookings_Controller {
         'callback'            => array( __CLASS__, 'get_bookings' ),
         'permission_callback' => function( WP_REST_Request $request ) {
             // 1. Check capability
-            if ( ! current_user_can( 'manage_options' ) ) {
+            if ( ! current_user_can( 'manage_mitii_bookings' ) ) {
                 return new WP_Error( 
                     'rest_forbidden', 
                     __( 'You do not have permission to view bookings.' ), 
@@ -60,7 +60,7 @@ class Mitii_Bookings_Controller {
     }
 
     public static function check_admin_permission() {
-        return current_user_can( 'manage_options' );
+        return current_user_can( 'manage_mitii_bookings' );
     }
 
     public static function get_bookings( $request ) {
@@ -71,64 +71,23 @@ class Mitii_Bookings_Controller {
 
         $page     = max( 1, intval( $request->get_param( 'page' ) ) ?: 1 );
         $per_page = intval( $request->get_param( 'per_page' ) ) ?: 20;
-        $per_page = min( 100, max( 1, $per_page ) );
+        $per_page = min( 100, max( 1, $per_page ) ); // hard cap so nobody can request an unbounded page size
         $offset   = ( $page - 1 ) * $per_page;
 
-        // ── Filters ────────────────────────────────────────────────────────────
-        $search     = sanitize_text_field( $request->get_param( 'search' ) );
-        $status     = sanitize_text_field( $request->get_param( 'status' ) );
-        $staff_id   = intval( $request->get_param( 'staff_id' ) );
-        $date_from  = sanitize_text_field( $request->get_param( 'date_from' ) );
-        $date_to    = sanitize_text_field( $request->get_param( 'date_to' ) );
+        $total = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $bookings_table" ) );
 
-        $where  = array( '1=1' );
-        $params = array();
-
-        if ( $search !== '' ) {
-            $like = '%' . $wpdb->esc_like( $search ) . '%';
-            $where[]  = '( b.customer_name LIKE %s OR b.customer_email LIKE %s )';
-            $params[] = $like;
-            $params[] = $like;
-        }
-
-        $allowed_statuses = array( 'pending', 'completed', 'cancelled' );
-        if ( $status !== '' && in_array( $status, $allowed_statuses, true ) ) {
-            $where[]  = 'b.status = %s';
-            $params[] = $status;
-        }
-
-        if ( $staff_id > 0 ) {
-            $where[]  = 'b.staff_id = %d';
-            $params[] = $staff_id;
-        }
-
-        if ( $date_from !== '' ) {
-            $where[]  = 'b.booking_date >= %s';
-            $params[] = $date_from;
-        }
-
-        if ( $date_to !== '' ) {
-            $where[]  = 'b.booking_date <= %s';
-            $params[] = $date_to;
-        }
-
-        $where_sql = implode( ' AND ', $where );
-
-        // Count with filters
-        $count_sql = "SELECT COUNT(*) FROM $bookings_table b WHERE $where_sql";
-        $total = intval( empty( $params ) ? $wpdb->get_var( $count_sql ) : $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) );
-
-        // Results with filters
-        $query_sql = "SELECT b.*, s.name AS service_name, s.price AS service_price, st.name AS staff_name
-                      FROM $bookings_table b
-                      LEFT JOIN $services_table s ON b.service_id = s.id
-                      LEFT JOIN $staff_table st ON b.staff_id = st.id
-                      WHERE $where_sql
-                      ORDER BY b.id DESC
-                      LIMIT %d OFFSET %d";
-
-        $query_params = array_merge( $params, array( $per_page, $offset ) );
-        $results = $wpdb->get_results( $wpdb->prepare( $query_sql, $query_params ) );
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT b.*, s.name AS service_name, s.price AS service_price, st.name AS staff_name
+                 FROM $bookings_table b
+                 LEFT JOIN $services_table s ON b.service_id = s.id
+                 LEFT JOIN $staff_table st ON b.staff_id = st.id
+                 ORDER BY b.id DESC
+                 LIMIT %d OFFSET %d",
+                $per_page,
+                $offset
+            )
+        );
 
         $response = rest_ensure_response( $results );
         $response->header( 'X-WP-Total', $total );
