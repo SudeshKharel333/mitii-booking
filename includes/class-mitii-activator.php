@@ -121,6 +121,35 @@ if ( $admin_role && ! $admin_role->has_cap( 'manage_mitii_bookings' ) ) {
     $admin_role->add_cap( 'manage_mitii_bookings' );
 }
 
+// ---- Break times (recurring daily blocks, e.g. lunch) ----
+$table_break_times = $wpdb->prefix . 'mitii_break_times';
+$sql_break_times = "CREATE TABLE $table_break_times (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    staff_id BIGINT UNSIGNED NOT NULL,
+    day_of_week TINYINT DEFAULT NULL COMMENT 'NULL = applies every working day, 0=Sun … 6=Sat',
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    label VARCHAR(100) NOT NULL DEFAULT 'Break',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY staff_day (staff_id, day_of_week)
+) $charset_collate;";
+dbDelta( $sql_break_times );
+
+// ---- Holidays (full-day off for a specific staff member on a specific date) ----
+$table_holidays = $wpdb->prefix . 'mitii_holidays';
+$sql_holidays = "CREATE TABLE $table_holidays (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    staff_id BIGINT UNSIGNED NOT NULL,
+    holiday_date DATE NOT NULL,
+    label VARCHAR(100) NOT NULL DEFAULT 'Holiday',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY staff_date_unique (staff_id, holiday_date),
+    KEY staff_id (staff_id)
+) $charset_collate;";
+dbDelta( $sql_holidays );
+
 // ---- Schedule the daily cleanup of expired customer sessions ----
 Mitii_Session_Cleanup::schedule();
 

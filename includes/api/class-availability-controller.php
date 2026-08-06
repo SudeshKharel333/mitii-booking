@@ -145,6 +145,17 @@ class Mitii_Availability_Controller {
             return array(); // staff doesn't work at all on this day of the week
         }
 
+        // ---- Holiday check: return no slots if this date is a holiday ----
+        if ( class_exists( 'Mitii_Schedule_Extras_Controller' ) &&
+             Mitii_Schedule_Extras_Controller::is_holiday( $staff_id, $date ) ) {
+            return array();
+        }
+
+        // ---- Break ranges: slots that overlap a break are excluded ----
+        $break_ranges = class_exists( 'Mitii_Schedule_Extras_Controller' )
+            ? Mitii_Schedule_Extras_Controller::get_break_ranges( $staff_id, $day_of_week )
+            : array();
+
         $bookings_table = $wpdb->prefix . 'mitii_bookings';
         $services_table = $wpdb->prefix . 'mitii_services';
         $existing = $wpdb->get_results(
@@ -187,6 +198,16 @@ class Mitii_Availability_Controller {
                     if ( $slot_start < $busy[1] && $slot_end > $busy[0] ) {
                         $conflict = true;
                         break;
+                    }
+                }
+
+                // Skip if this slot overlaps any break time.
+                if ( ! $conflict ) {
+                    foreach ( $break_ranges as $brk ) {
+                        if ( $slot_start < $brk[1] && $slot_end > $brk[0] ) {
+                            $conflict = true;
+                            break;
+                        }
                     }
                 }
 

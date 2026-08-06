@@ -12,6 +12,7 @@ define( 'MITII_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 
 require_once MITII_PLUGIN_DIR . 'includes/api/class-availability-controller.php';
+require_once MITII_PLUGIN_DIR . 'includes/api/class-schedule-extras-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/admin/class-mitii-admin-menu.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-session-cleanup.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-activator.php';
@@ -50,3 +51,4 @@ add_action( 'wp_enqueue_scripts', array( 'Mitii_Staff_First_Shortcode', 'enqueue
 add_action( 'init', array( 'Mitii_Page_Template', 'register' ) );
 add_action( 'init', array( 'Mitii_Clean_Mode', 'register' ) );
 add_action( 'rest_api_init', array( 'Mitii_Availability_Controller', 'register_routes' ) );
+add_action( 'rest_api_init', array( 'Mitii_Schedule_Extras_Controller', 'register_routes' ) );
