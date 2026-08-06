@@ -32,7 +32,8 @@ const DAY_NAMES = [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fri
 
 const emptyWeek = (): DaySchedule[] =>
     DAY_NAMES.map( () => ( { enabled: false, start: '09:00', end: '18:00' } ) );
-function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' | 'staff' } ) {
+
+function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' | 'staff' | 'customers' } ) {
     return (
         <div className="mitii-nav-pills">
             <a href="admin.php?page=mitii-dashboard" className={ `mitii-nav-pill${ active === 'dashboard' ? ' is-active' : '' }` }>
@@ -47,9 +48,13 @@ function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' |
             <a href="admin.php?page=mitii-staff" className={ `mitii-nav-pill${ active === 'staff' ? ' is-active' : '' }` }>
                 Staff
             </a>
+            <a href="admin.php?page=mitii-customers" className={ `mitii-nav-pill${ active === 'customers' ? ' is-active' : '' }` }>
+                Customers
+            </a>
         </div>
     );
 }
+
 declare global {
     interface Window {
         wp: any;
@@ -265,6 +270,7 @@ export default function StaffPage() {
 
     return (
         <div className="mitii-admin">
+            <NavPills active="staff" />
             <h1>Staff</h1>
             <p className="mitii-subtitle">Manage your team and which services each person offers.</p>
 

@@ -55,7 +55,11 @@ class Mitii_Bookings_Controller {
         'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
     ) );
 
-
+    register_rest_route( 'mitii/v1', '/dashboard/stats', array(
+        'methods'             => 'GET',
+        'callback'            => array( __CLASS__, 'get_dashboard_stats' ),
+        'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
+    ) );
 
     }
 
@@ -246,6 +250,78 @@ public static function update_booking_status( $request ) {
     $wpdb->update( $table, array( 'status' => $status ), array( 'id' => $id ) );
 
     return rest_ensure_response( array( 'id' => $id, 'status' => $status, 'message' => 'Booking status updated' ) );
+}
+
+public static function get_dashboard_stats( $request ) {
+    global $wpdb;
+    $table = $wpdb->prefix . 'mitii_bookings';
+
+    $days = intval( $request->get_param( 'days' ) ) ?: 30;
+    $days = min( 90, max( 7, $days ) ); // keep the range sane — a week to three months
+
+    $start_date = gmdate( 'Y-m-d', strtotime( "-{$days} days" ) );
+
+    // ---- Daily counts for the chart (cancelled bookings excluded — the graph
+    // tracks real appointment activity, not abandoned/cancelled attempts) ----
+    $rows = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT booking_date, COUNT(*) AS total
+             FROM $table
+             WHERE booking_date >= %s AND status != 'cancelled'
+             GROUP BY booking_date
+             ORDER BY booking_date ASC",
+            $start_date
+        )
+    );
+
+    $counts_by_date = array();
+    foreach ( $rows as $row ) {
+        $counts_by_date[ $row->booking_date ] = intval( $row->total );
+    }
+
+    // Fill in every date in the range, even ones with zero bookings, so the
+    // chart doesn't skip days.
+    $series = array();
+    for ( $i = $days - 1; $i >= 0; $i-- ) {
+        $date = gmdate( 'Y-m-d', strtotime( "-{$i} days" ) );
+        $series[] = array(
+            'date'  => $date,
+            'count' => isset( $counts_by_date[ $date ] ) ? $counts_by_date[ $date ] : 0,
+        );
+    }
+
+    // ---- Summary tiles ----
+    $total_bookings = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $table" ) );
+
+    $today = current_time( 'Y-m-d' );
+    $upcoming = intval(
+        $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM $table WHERE booking_date >= %s AND status != 'cancelled'",
+                $today
+            )
+        )
+    );
+
+    $pending = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $table WHERE status = 'pending'" ) );
+
+    $services_table = $wpdb->prefix . 'mitii_services';
+    $completed_revenue = $wpdb->get_var(
+        "SELECT COALESCE(SUM(s.price), 0)
+         FROM $table b
+         LEFT JOIN $services_table s ON b.service_id = s.id
+         WHERE b.status = 'completed'"
+    );
+
+    return rest_ensure_response( array(
+        'series'  => $series,
+        'summary' => array(
+            'total_bookings'    => $total_bookings,
+            'upcoming_bookings' => $upcoming,
+            'pending_bookings'  => $pending,
+            'completed_revenue' => (float) $completed_revenue,
+        ),
+    ) );
 }
 
 }

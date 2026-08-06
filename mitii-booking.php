@@ -12,7 +12,6 @@ define( 'MITII_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 
 require_once MITII_PLUGIN_DIR . 'includes/api/class-availability-controller.php';
-require_once MITII_PLUGIN_DIR . 'includes/api/class-dashboard-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/admin/class-mitii-admin-menu.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-session-cleanup.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-activator.php';
@@ -22,6 +21,7 @@ require_once MITII_PLUGIN_DIR . 'includes/api/class-staff-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-bookings-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-shortcode.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-customer-auth-controller.php';
+require_once MITII_PLUGIN_DIR . 'includes/api/class-customers-admin-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-customer-session.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-rate-limiter.php';
 require_once MITII_PLUGIN_DIR . 'includes/class-mitii-staff-first-shortcode.php';
@@ -37,6 +37,7 @@ add_action( 'init', array( 'Mitii_Customer_Portal_Shortcode', 'register' ) );
 add_action( 'wp_enqueue_scripts', array( 'Mitii_Customer_Portal_Shortcode', 'enqueue_assets' ) );
 
 add_action( 'rest_api_init', array( 'Mitii_Customer_Auth_Controller', 'register_routes' ) );
+add_action( 'rest_api_init', array( 'Mitii_Customers_Admin_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Services_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Staff_Controller', 'register_routes' ) );
 add_action( 'rest_api_init', array( 'Mitii_Bookings_Controller', 'register_routes' ) );
@@ -49,4 +50,3 @@ add_action( 'wp_enqueue_scripts', array( 'Mitii_Staff_First_Shortcode', 'enqueue
 add_action( 'init', array( 'Mitii_Page_Template', 'register' ) );
 add_action( 'init', array( 'Mitii_Clean_Mode', 'register' ) );
 add_action( 'rest_api_init', array( 'Mitii_Availability_Controller', 'register_routes' ) );
-add_action( 'rest_api_init', array( 'Mitii_Dashboard_Controller', 'register_routes' ) );

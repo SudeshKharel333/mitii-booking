@@ -8,13 +8,22 @@ class Mitii_Admin_Menu {
             'Mitii Booking',
             'Mitii Booking',
             'manage_mitii_bookings',
-            'mitii-bookings',
-            array( __CLASS__, 'render_bookings_page' ),
+            'mitii-dashboard',
+            array( __CLASS__, 'render_dashboard_page' ),
             'dashicons-calendar-alt'
         );
 
         add_submenu_page(
-            'mitii-bookings',
+            'mitii-dashboard',
+            'Dashboard',
+            'Dashboard',
+            'manage_mitii_bookings',
+            'mitii-dashboard',
+            array( __CLASS__, 'render_dashboard_page' )
+        );
+
+        add_submenu_page(
+            'mitii-dashboard',
             'Bookings',
             'Bookings',
             'manage_mitii_bookings',
@@ -23,7 +32,7 @@ class Mitii_Admin_Menu {
         );
 
         add_submenu_page(
-            'mitii-bookings',
+            'mitii-dashboard',
             'Services',
             'Services',
             'manage_mitii_bookings',
@@ -32,13 +41,26 @@ class Mitii_Admin_Menu {
         );
 
         add_submenu_page(
-            'mitii-bookings',
+            'mitii-dashboard',
             'Staff',
             'Staff',
             'manage_mitii_bookings',
             'mitii-staff',
             array( __CLASS__, 'render_staff_page' )
         );
+
+        add_submenu_page(
+            'mitii-dashboard',
+            'Customers',
+            'Customers',
+            'manage_mitii_bookings',
+            'mitii-customers',
+            array( __CLASS__, 'render_customers_page' )
+        );
+    }
+
+    public static function render_dashboard_page() {
+        echo '<div id="mitii-dashboard-root"></div>';
     }
 
     public static function render_bookings_page() {
@@ -53,11 +75,17 @@ class Mitii_Admin_Menu {
         echo '<div id="mitii-staff-root"></div>';
     }
 
+    public static function render_customers_page() {
+        echo '<div id="mitii-customers-root"></div>';
+    }
+
     public static function enqueue_assets( $hook ) {
         $script_map = array(
-            'toplevel_page_mitii-bookings'          => array( 'admin-bookings', 'mitii-bookings-root' ),
+            'toplevel_page_mitii-dashboard'          => array( 'admin-dashboard', 'mitii-dashboard-root' ),
+            'mitii-booking_page_mitii-bookings'      => array( 'admin-bookings', 'mitii-bookings-root' ),
             'mitii-booking_page_mitii-services'      => array( 'admin-services', 'mitii-services-root' ),
             'mitii-booking_page_mitii-staff'         => array( 'admin-staff', 'mitii-staff-root' ),
+            'mitii-booking_page_mitii-customers'     => array( 'admin-customers', 'mitii-customers-root' ),
         );
 
         if ( ! isset( $script_map[ $hook ] ) ) {

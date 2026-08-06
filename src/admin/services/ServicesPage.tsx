@@ -16,7 +16,7 @@ declare global {
     }
 }
 
-function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' | 'staff' } ) {
+function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' | 'staff' | 'customers' } ) {
     return (
         <div className="mitii-nav-pills">
             <a href="admin.php?page=mitii-dashboard" className={ `mitii-nav-pill${ active === 'dashboard' ? ' is-active' : '' }` }>
@@ -30,6 +30,9 @@ function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' |
             </a>
             <a href="admin.php?page=mitii-staff" className={ `mitii-nav-pill${ active === 'staff' ? ' is-active' : '' }` }>
                 Staff
+            </a>
+            <a href="admin.php?page=mitii-customers" className={ `mitii-nav-pill${ active === 'customers' ? ' is-active' : '' }` }>
+                Customers
             </a>
         </div>
     );
