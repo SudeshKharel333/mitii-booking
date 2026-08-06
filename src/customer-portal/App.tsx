@@ -14,12 +14,25 @@ type CurrentUser = {
     email?: string;
 };
 
+declare global {
+    interface Window {
+        mitiiPortalData?: {
+            serviceBookingUrl?: string;
+            staffBookingUrl?: string;
+        };
+    }
+}
+
 export default function App() {
     const [ user, setUser ] = useState<CurrentUser | null>( null );
     const [ mode, setMode ] = useState<'login' | 'register'>( 'login' );
     const [ tab, setTab ] = useState<'dashboard' | 'bookings' | 'profile'>( 'dashboard' );
     const [ loading, setLoading ] = useState( true );
     const [ loadError, setLoadError ] = useState( '' );
+
+    const portalData = window.mitiiPortalData || {};
+    const serviceBookingUrl = portalData.serviceBookingUrl || '';
+    const staffBookingUrl   = portalData.staffBookingUrl   || '';
 
     const checkLoginStatus = () => {
         fetch( '/wp-json/mitii/v1/customer/me', { credentials: 'same-origin' } )
@@ -143,6 +156,8 @@ export default function App() {
                     <CustomerDashboard
                         userName={ user.name || 'there' }
                         onGoToBookings={ () => setTab( 'bookings' ) }
+                        serviceBookingUrl={ serviceBookingUrl }
+                        staffBookingUrl={ staffBookingUrl }
                     />
                 ) }
                 { tab === 'bookings' && (

@@ -13,9 +13,11 @@ type Booking = {
 type Props = {
     userName: string;
     onGoToBookings: () => void;
+    serviceBookingUrl: string;
+    staffBookingUrl: string;
 };
 
-export default function CustomerDashboard( { userName, onGoToBookings }: Props ) {
+export default function CustomerDashboard( { userName, onGoToBookings, serviceBookingUrl, staffBookingUrl }: Props ) {
     const [ bookings, setBookings ] = useState<Booking[]>( [] );
     const [ loading, setLoading ] = useState( true );
 
@@ -73,6 +75,8 @@ export default function CustomerDashboard( { userName, onGoToBookings }: Props )
 
     const firstName = userName.split( ' ' )[ 0 ];
 
+    const hasBookingLinks = serviceBookingUrl || staffBookingUrl;
+
     return (
         <div>
             {/* ── Greeting ── */}
@@ -84,6 +88,78 @@ export default function CustomerDashboard( { userName, onGoToBookings }: Props )
                     Here's a summary of your appointments.
                 </p>
             </div>
+
+            {/* ── Book Now buttons ── */}
+            { hasBookingLinks && (
+                <div style={ {
+                    display: 'grid',
+                    gridTemplateColumns: serviceBookingUrl && staffBookingUrl ? 'repeat(2, 1fr)' : '1fr',
+                    gap: 12,
+                    marginBottom: 20,
+                } }>
+                    { serviceBookingUrl && (
+                        <a
+                            href={ serviceBookingUrl }
+                            style={ {
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 10,
+                                background: 'linear-gradient(135deg, var(--mitii-teal-dark) 0%, var(--mitii-teal) 100%)',
+                                color: '#fff',
+                                textDecoration: 'none',
+                                borderRadius: 14,
+                                padding: '14px 16px',
+                                fontSize: 14,
+                                fontWeight: 700,
+                                boxShadow: 'var(--elevation-1)',
+                                transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                            } }
+                            onMouseEnter={ e => {
+                                ( e.currentTarget as HTMLElement ).style.transform = 'translateY(-2px)';
+                                ( e.currentTarget as HTMLElement ).style.boxShadow = 'var(--elevation-2)';
+                            } }
+                            onMouseLeave={ e => {
+                                ( e.currentTarget as HTMLElement ).style.transform = 'translateY(0)';
+                                ( e.currentTarget as HTMLElement ).style.boxShadow = 'var(--elevation-1)';
+                            } }
+                        >
+                            <span>Book by Service</span>
+                        </a>
+                    ) }
+                    { staffBookingUrl && (
+                        <a
+                            href={ staffBookingUrl }
+                            style={ {
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 10,
+                                background: '#fff',
+                                color: 'var(--mitii-teal-dark)',
+                                textDecoration: 'none',
+                                borderRadius: 14,
+                                padding: '14px 16px',
+                                fontSize: 14,
+                                fontWeight: 700,
+                                boxShadow: 'var(--elevation-1)',
+                                border: '2px solid var(--mitii-teal)',
+                                transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                            } }
+                            onMouseEnter={ e => {
+                                ( e.currentTarget as HTMLElement ).style.transform = 'translateY(-2px)';
+                                ( e.currentTarget as HTMLElement ).style.boxShadow = 'var(--elevation-2)';
+                            } }
+                            onMouseLeave={ e => {
+                                ( e.currentTarget as HTMLElement ).style.transform = 'translateY(0)';
+                                ( e.currentTarget as HTMLElement ).style.boxShadow = 'var(--elevation-1)';
+                            } }
+                        >
+                            <span>Book by Staff</span>
+                        </a>
+                    ) }
+                </div>
+            ) }
 
             {/* ── Next appointment highlight ── */}
             { next ? (
@@ -221,29 +297,33 @@ function KpiCard( { value, label }: { value: string; label: string } ) {
             textAlign: 'center',
         } }>
             <div style={ { fontSize: 18, fontWeight: 800, color: 'var(--mitii-teal-dark)', lineHeight: 1.1 } }>{ value }</div>
-            <div style={ { fontSize: 11, color: 'var(--mitii-ink-soft)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 } }>{ label }</div>
+            <div style={ { fontSize: 11, color: 'var(--mitii-ink-soft)', marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.06em' } }>{ label }</div>
         </div>
     );
 }
 
 function StatusBar( { completed, upcoming, cancelled }: { completed: number; upcoming: number; cancelled: number } ) {
-    const total = completed + upcoming + cancelled || 1;
-    const pct = ( n: number ) => ( n / total ) * 100;
+    const total = completed + upcoming + cancelled;
+    if ( total === 0 ) return null;
+    const pCompleted = ( completed / total ) * 100;
+    const pUpcoming  = ( upcoming  / total ) * 100;
+    const pCancelled = ( cancelled / total ) * 100;
+
     return (
-        <div style={ { height: 10, borderRadius: 999, overflow: 'hidden', display: 'flex', background: 'var(--mitii-border)' } }>
-            { completed > 0 && <div style={ { width: `${ pct( completed ) }%`, background: 'var(--mitii-teal)', transition: 'width 0.4s ease' } } /> }
-            { upcoming > 0  && <div style={ { width: `${ pct( upcoming ) }%`,  background: 'var(--mitii-gold)',   transition: 'width 0.4s ease' } } /> }
-            { cancelled > 0 && <div style={ { width: `${ pct( cancelled ) }%`, background: 'var(--mitii-danger)', transition: 'width 0.4s ease' } } /> }
+        <div style={ { display: 'flex', height: 8, borderRadius: 999, overflow: 'hidden', background: '#f0f0f0' } }>
+            { completed > 0 && <div style={ { width: `${ pCompleted }%`, background: 'var(--mitii-teal)' } } /> }
+            { upcoming  > 0 && <div style={ { width: `${ pUpcoming  }%`, background: 'var(--mitii-gold)' } } /> }
+            { cancelled > 0 && <div style={ { width: `${ pCancelled }%`, background: 'var(--mitii-danger)' } } /> }
         </div>
     );
 }
 
 function Legend( { color, label, count }: { color: string; label: string; count: number } ) {
     return (
-        <div style={ { display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 } }>
-            <span style={ { width: 8, height: 8, borderRadius: '50%', background: color, display: 'inline-block', flexShrink: 0 } } />
-            <span style={ { color: 'var(--mitii-ink-soft)' } }>{ label }</span>
-            <strong style={ { color: 'var(--mitii-ink)' } }>{ count }</strong>
+        <div style={ { display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--mitii-ink-soft)' } }>
+            <span style={ { width: 10, height: 10, borderRadius: '50%', background: color, display: 'inline-block' } } />
+            <span>{ label }</span>
+            <span style={ { fontWeight: 700, color: 'var(--mitii-ink)' } }>{ count }</span>
         </div>
     );
 }
@@ -254,33 +334,48 @@ function UpcomingRow( { booking, isFirst }: { booking: Booking; isFirst: boolean
             display: 'flex',
             alignItems: 'center',
             gap: 14,
-            padding: '11px 0',
-            borderTop: isFirst ? 'none' : '1px solid var(--mitii-border)',
+            padding: '14px 16px',
+            background: '#fff',
+            borderRadius: 14,
+            marginBottom: 10,
+            boxShadow: 'var(--elevation-1)',
+            borderLeft: isFirst ? '4px solid var(--mitii-teal)' : '4px solid transparent',
         } }>
             <div style={ {
-                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-                background: isFirst ? 'var(--mitii-teal)' : 'var(--mitii-teal-light)',
-                color: isFirst ? '#fff' : 'var(--mitii-teal-dark)',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                fontSize: 11, fontWeight: 800, lineHeight: 1.2,
+                width: 44,
+                height: 44,
+                borderRadius: 12,
+                background: 'var(--mitii-teal-light)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 20,
+                flexShrink: 0,
             } }>
-                <span style={ { fontSize: 13 } }>{ new Date( booking.booking_date ).getDate() }</span>
-                <span>{ new Date( booking.booking_date + 'T00:00:00' ).toLocaleString( 'default', { month: 'short' } ) }</span>
+                { booking.service_name ? booking.service_name[ 0 ].toUpperCase() : '?' }
             </div>
-            <div style={ { flex: 1 } }>
-                <div style={ { fontWeight: 700, fontSize: 14, color: 'var(--mitii-ink)' } }>
+            <div style={ { flex: 1, minWidth: 0 } }>
+                <p style={ { margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--mitii-ink)' } }>
                     { booking.service_name || 'Appointment' }
-                </div>
-                <div style={ { fontSize: 12, color: 'var(--mitii-ink-soft)', marginTop: 2 } }>
-                    { booking.booking_time.slice( 0, 5 ) }
-                    { booking.staff_name ? ` · with ${ booking.staff_name }` : '' }
-                </div>
+                </p>
+                <p style={ { margin: '2px 0 0', fontSize: 12, color: 'var(--mitii-ink-soft)' } }>
+                    { booking.booking_date } at { booking.booking_time.slice( 0, 5 ) }
+                    { booking.staff_name ? ` · ${ booking.staff_name }` : '' }
+                </p>
             </div>
-            { booking.service_price && (
-                <div style={ { fontWeight: 700, fontSize: 14, color: 'var(--mitii-teal-dark)', flexShrink: 0 } }>
-                    ${ booking.service_price }
-                </div>
-            ) }
+            <span style={ {
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: booking.status === 'pending' ? 'var(--mitii-gold)' : 'var(--mitii-teal)',
+                background: booking.status === 'pending' ? 'var(--mitii-gold-light)' : 'var(--mitii-teal-light)',
+                padding: '4px 10px',
+                borderRadius: 999,
+                whiteSpace: 'nowrap',
+            } }>
+                { booking.status }
+            </span>
         </div>
     );
 }
