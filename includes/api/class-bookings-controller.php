@@ -4,32 +4,30 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Mitii_Bookings_Controller {
 
     public static function register_routes() {
-       register_rest_route( 'mitii/v1', '/bookings', array(
-        'methods'             => 'GET',
-        'callback'            => array( __CLASS__, 'get_bookings' ),
-        'permission_callback' => function( WP_REST_Request $request ) {
-            // 1. Check capability
-            if ( ! current_user_can( 'manage_mitii_bookings' ) ) {
-                return new WP_Error( 
-                    'rest_forbidden', 
-                    __( 'You do not have permission to view bookings.' ), 
-                    array( 'status' => 403 ) 
-                );
-}
-            // Optional: Standard WP REST automatically checks X-WP-Nonce for cookie auth.
-            // But if you are passing a custom nonce in headers (e.g., 'X-Mitii-Nonce'):
-            $nonce = $request->get_header( 'x_mitii_nonce' );
-            if ( $nonce && ! wp_verify_nonce( $nonce, 'mitii_bookings_nonce' ) ) {
-                return new WP_Error( 
-                    'rest_invalid_nonce', 
-                    __( 'Invalid security token.' ), 
-                    array( 'status' => 403 ) 
-                );
-            }
+        register_rest_route( 'mitii/v1', '/bookings', array(
+            'methods'             => 'GET',
+            'callback'            => array( __CLASS__, 'get_bookings' ),
+            'permission_callback' => function( WP_REST_Request $request ) {
+                if ( ! current_user_can( 'manage_mitii_bookings' ) ) {
+                    return new WP_Error(
+                        'rest_forbidden',
+                        __( 'You do not have permission to view bookings.' ),
+                        array( 'status' => 403 )
+                    );
+                }
 
-            return true;
-        },
-    ) );
+                $nonce = $request->get_header( 'x_mitii_nonce' );
+                if ( $nonce && ! wp_verify_nonce( $nonce, 'mitii_bookings_nonce' ) ) {
+                    return new WP_Error(
+                        'rest_invalid_nonce',
+                        __( 'Invalid security token.' ),
+                        array( 'status' => 403 )
+                    );
+                }
+
+                return true;
+            },
+        ) );
 
         register_rest_route( 'mitii/v1', '/bookings', array(
             'methods'             => 'POST',
@@ -37,81 +35,49 @@ class Mitii_Bookings_Controller {
             'permission_callback' => '__return_true',
         ) );
 
- register_rest_route( 'mitii/v1', '/my-bookings', array(
-        'methods'             => 'GET',
-        'callback'            => array( __CLASS__, 'get_my_bookings' ),
-        'permission_callback' => array( __CLASS__, 'check_logged_in' ),
-    ) );
+        register_rest_route( 'mitii/v1', '/my-bookings', array(
+            'methods'             => 'GET',
+            'callback'            => array( __CLASS__, 'get_my_bookings' ),
+            'permission_callback' => array( __CLASS__, 'check_logged_in' ),
+        ) );
 
-    register_rest_route( 'mitii/v1', '/my-bookings/(?P<id>\d+)/cancel', array(
-        'methods'             => 'POST',
-        'callback'            => array( __CLASS__, 'cancel_my_booking' ),
-        'permission_callback' => array( __CLASS__, 'check_logged_in' ),
-    ) );
+        register_rest_route( 'mitii/v1', '/my-bookings/(?P<id>\d+)/cancel', array(
+            'methods'             => 'POST',
+            'callback'            => array( __CLASS__, 'cancel_my_booking' ),
+            'permission_callback' => array( __CLASS__, 'check_logged_in' ),
+        ) );
 
-    register_rest_route( 'mitii/v1', '/bookings/(?P<id>\d+)/status', array(
-        'methods'             => 'PUT',
-        'callback'            => array( __CLASS__, 'update_booking_status' ),
-        'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
-    ) );
+        register_rest_route( 'mitii/v1', '/bookings/(?P<id>\d+)/status', array(
+            'methods'             => 'PUT',
+            'callback'            => array( __CLASS__, 'update_booking_status' ),
+            'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
+        ) );
 
-    register_rest_route( 'mitii/v1', '/dashboard/stats', array(
-        'methods'             => 'GET',
-        'callback'            => array( __CLASS__, 'get_dashboard_stats' ),
-        'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
-    ) );
-
+        register_rest_route( 'mitii/v1', '/dashboard/stats', array(
+            'methods'             => 'GET',
+            'callback'            => array( __CLASS__, 'get_dashboard_stats' ),
+            'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
+        ) );
     }
 
     public static function check_admin_permission() {
         return current_user_can( 'manage_mitii_bookings' );
     }
 
-    public static function get_bookings( $request ) {
-        global $wpdb;
-        $bookings_table = $wpdb->prefix . 'mitii_bookings';
-        $services_table = $wpdb->prefix . 'mitii_services';
-        $staff_table    = $wpdb->prefix . 'mitii_staff';
-
-        $page     = max( 1, intval( $request->get_param( 'page' ) ) ?: 1 );
-        $per_page = intval( $request->get_param( 'per_page' ) ) ?: 20;
-        $per_page = min( 100, max( 1, $per_page ) ); // hard cap so nobody can request an unbounded page size
-        $offset   = ( $page - 1 ) * $per_page;
-
-        $total = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $bookings_table" ) );
-
-        $results = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT b.*, s.name AS service_name, s.price AS service_price, st.name AS staff_name
-                 FROM $bookings_table b
-                 LEFT JOIN $services_table s ON b.service_id = s.id
-                 LEFT JOIN $staff_table st ON b.staff_id = st.id
-                 ORDER BY b.id DESC
-                 LIMIT %d OFFSET %d",
-                $per_page,
-                $offset
-            )
-        );
-
-        $response = rest_ensure_response( $results );
-        $response->header( 'X-WP-Total', $total );
-        $response->header( 'X-WP-TotalPages', (int) ceil( $total / $per_page ) );
-
-        return $response;
+    public static function check_logged_in() {
+        return Mitii_Customer_Session::get_current_customer_id() !== null;
     }
 
-    public static function create_booking( $request ) {
+    public static function get_bookings() {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_bookings';
+        $results = $wpdb->get_results( "SELECT * FROM $table ORDER BY booking_date DESC, booking_time DESC" );
+        return rest_ensure_response( $results );
+    }
 
-        $client_ip = Mitii_Rate_Limiter::get_client_ip();
-        if ( ! Mitii_Rate_Limiter::check( 'booking_' . $client_ip, 10, 10 * MINUTE_IN_SECONDS ) ) {
-            return new WP_Error(
-                'rate_limited',
-                'Too many booking attempts. Please wait a few minutes and try again.',
-                array( 'status' => 429 )
-            );
-        }
+    public static function create_booking( WP_REST_Request $request ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mitii_bookings';
 
         $service_id     = intval( $request['service_id'] );
         $staff_id       = intval( $request['staff_id'] );
@@ -120,208 +86,107 @@ class Mitii_Bookings_Controller {
         $booking_date   = sanitize_text_field( $request['booking_date'] );
         $booking_time   = sanitize_text_field( $request['booking_time'] );
 
-        if ( empty( $customer_name ) || empty( $customer_email ) || empty( $booking_date ) || empty( $booking_time ) ) {
-            return new WP_Error( 'missing_fields', 'Please fill in all required fields', array( 'status' => 400 ) );
-        }
-
-        if ( ! is_email( $customer_email ) ) {
-            return new WP_Error( 'invalid_email', 'Please enter a valid email address', array( 'status' => 400 ) );
-        }
-
-        if ( ! Mitii_Availability_Controller::is_slot_available( $staff_id, $booking_date, $service_id, $booking_time ) ) {
-            return new WP_Error( 'slot_unavailable', 'That time is no longer available. Please choose another slot.', array( 'status' => 409 ) );
+        // 🌴 GLOBAL HOLIDAY GUARD — reject bookings on closure days
+        if ( Mitii_Holidays_Controller::is_holiday( $booking_date ) ) {
+            return new WP_Error(
+                'shop_closed',
+                'The selected date is a shop closure day. Please choose another date.',
+                array( 'status' => 400 )
+            );
         }
 
         $wpdb->insert( $table, array(
-            'service_id'      => $service_id,
-            'staff_id'        => $staff_id,
-            'customer_name'   => $customer_name,
-            'customer_email'  => $customer_email,
-            'booking_date'    => $booking_date,
-            'booking_time'    => $booking_time,
-            'status'          => 'pending',
+            'service_id'     => $service_id,
+            'staff_id'       => $staff_id,
+            'customer_name'  => $customer_name,
+            'customer_email' => $customer_email,
+            'booking_date'   => $booking_date,
+            'booking_time'   => $booking_time,
+            'status'         => 'pending',
         ) );
 
         return rest_ensure_response( array(
             'id'      => $wpdb->insert_id,
-            'message' => 'Booking created successfully',
+            'message' => 'Booking created successfully.',
         ) );
     }
-public static function check_logged_in() {
-    return Mitii_Customer_Session::get_current_customer_id() !== null;
-}
 
-public static function get_my_bookings( $request ) {
-    global $wpdb;
-    $bookings_table  = $wpdb->prefix . 'mitii_bookings';
-    $services_table  = $wpdb->prefix . 'mitii_services';
-    $staff_table     = $wpdb->prefix . 'mitii_staff';
-    $customers_table = $wpdb->prefix . 'mitii_customers';
+    public static function get_my_bookings() {
+        global $wpdb;
+        $table       = $wpdb->prefix . 'mitii_bookings';
+        $customer_id = Mitii_Customer_Session::get_current_customer_id();
 
-    $customer_id = Mitii_Customer_Session::get_current_customer_id();
-    $customer = $wpdb->get_row(
-        $wpdb->prepare( "SELECT email FROM $customers_table WHERE id = %d", $customer_id )
-    );
+        if ( ! $customer_id ) {
+            return new WP_Error( 'not_logged_in', 'You must be logged in.', array( 'status' => 401 ) );
+        }
 
-    if ( ! $customer ) {
-        return new WP_Error( 'not_found', 'Customer not found', array( 'status' => 404 ) );
-    }
-
-    $page     = max( 1, intval( $request->get_param( 'page' ) ) ?: 1 );
-    $per_page = intval( $request->get_param( 'per_page' ) ) ?: 20;
-    $per_page = min( 100, max( 1, $per_page ) );
-    $offset   = ( $page - 1 ) * $per_page;
-
-    $total = intval(
-        $wpdb->get_var(
-            $wpdb->prepare( "SELECT COUNT(*) FROM $bookings_table WHERE customer_email = %s", $customer->email )
-        )
-    );
-
-    $results = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT b.*, s.name AS service_name, s.price AS service_price, st.name AS staff_name
-             FROM $bookings_table b
-             LEFT JOIN $services_table s ON b.service_id = s.id
-             LEFT JOIN $staff_table st ON b.staff_id = st.id
-             WHERE b.customer_email = %s
-             ORDER BY b.booking_date DESC, b.booking_time DESC
-             LIMIT %d OFFSET %d",
-            $customer->email,
-            $per_page,
-            $offset
-        )
-    );
-
-    $response = rest_ensure_response( $results );
-    $response->header( 'X-WP-Total', $total );
-    $response->header( 'X-WP-TotalPages', (int) ceil( $total / $per_page ) );
-
-    return $response;
-}
-
-public static function cancel_my_booking( $request ) {
-    global $wpdb;
-    $table = $wpdb->prefix . 'mitii_bookings';
-    $customers_table = $wpdb->prefix . 'mitii_customers';
-    $id = intval( $request['id'] );
-
-    $customer_id = Mitii_Customer_Session::get_current_customer_id();
-    $customer = $wpdb->get_row(
-        $wpdb->prepare( "SELECT email FROM $customers_table WHERE id = %d", $customer_id )
-    );
-
-    $booking = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $id ) );
-
-    if ( ! $booking ) {
-        return new WP_Error( 'not_found', 'Booking not found', array( 'status' => 404 ) );
-    }
-
-    if ( $booking->customer_email !== $customer->email ) {
-        return new WP_Error( 'forbidden', 'You cannot cancel a booking that is not yours', array( 'status' => 403 ) );
-    }
-
-    $wpdb->update( $table, array( 'status' => 'cancelled' ), array( 'id' => $id ) );
-
-    return rest_ensure_response( array( 'id' => $id, 'message' => 'Booking cancelled' ) );
-}
-
-public static function update_booking_status( $request ) {
-    global $wpdb;
-    $table = $wpdb->prefix . 'mitii_bookings';
-    $id     = intval( $request['id'] );
-    $status = sanitize_text_field( $request['status'] );
-
-    $allowed_statuses = array( 'pending', 'completed', 'cancelled' );
-
-    if ( ! in_array( $status, $allowed_statuses, true ) ) {
-        return new WP_Error(
-            'invalid_status',
-            'Status must be one of: ' . implode( ', ', $allowed_statuses ),
-            array( 'status' => 400 )
-        );
-    }
-
-    $booking = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM $table WHERE id = %d", $id ) );
-    if ( ! $booking ) {
-        return new WP_Error( 'not_found', 'Booking not found', array( 'status' => 404 ) );
-    }
-
-    $wpdb->update( $table, array( 'status' => $status ), array( 'id' => $id ) );
-
-    return rest_ensure_response( array( 'id' => $id, 'status' => $status, 'message' => 'Booking status updated' ) );
-}
-
-public static function get_dashboard_stats( $request ) {
-    global $wpdb;
-    $table = $wpdb->prefix . 'mitii_bookings';
-
-    $days = intval( $request->get_param( 'days' ) ) ?: 30;
-    $days = min( 90, max( 7, $days ) ); // keep the range sane — a week to three months
-
-    $start_date = gmdate( 'Y-m-d', strtotime( "-{$days} days" ) );
-
-    // ---- Daily counts for the chart (cancelled bookings excluded — the graph
-    // tracks real appointment activity, not abandoned/cancelled attempts) ----
-    $rows = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT booking_date, COUNT(*) AS total
-             FROM $table
-             WHERE booking_date >= %s AND status != 'cancelled'
-             GROUP BY booking_date
-             ORDER BY booking_date ASC",
-            $start_date
-        )
-    );
-
-    $counts_by_date = array();
-    foreach ( $rows as $row ) {
-        $counts_by_date[ $row->booking_date ] = intval( $row->total );
-    }
-
-    // Fill in every date in the range, even ones with zero bookings, so the
-    // chart doesn't skip days.
-    $series = array();
-    for ( $i = $days - 1; $i >= 0; $i-- ) {
-        $date = gmdate( 'Y-m-d', strtotime( "-{$i} days" ) );
-        $series[] = array(
-            'date'  => $date,
-            'count' => isset( $counts_by_date[ $date ] ) ? $counts_by_date[ $date ] : 0,
-        );
-    }
-
-    // ---- Summary tiles ----
-    $total_bookings = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $table" ) );
-
-    $today = current_time( 'Y-m-d' );
-    $upcoming = intval(
-        $wpdb->get_var(
+        $results = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT COUNT(*) FROM $table WHERE booking_date >= %s AND status != 'cancelled'",
-                $today
+                "SELECT b.*, s.name as service_name, s.price as service_price, st.name as staff_name
+                 FROM $table b
+                 LEFT JOIN {$wpdb->prefix}mitii_services s ON b.service_id = s.id
+                 LEFT JOIN {$wpdb->prefix}mitii_staff st ON b.staff_id = st.id
+                 WHERE b.customer_email = (SELECT email FROM {$wpdb->prefix}mitii_customers WHERE id = %d)
+                 ORDER BY b.booking_date DESC, b.booking_time DESC",
+                $customer_id
             )
-        )
-    );
+        );
 
-    $pending = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $table WHERE status = 'pending'" ) );
+        return rest_ensure_response( $results );
+    }
 
-    $services_table = $wpdb->prefix . 'mitii_services';
-    $completed_revenue = $wpdb->get_var(
-        "SELECT COALESCE(SUM(s.price), 0)
-         FROM $table b
-         LEFT JOIN $services_table s ON b.service_id = s.id
-         WHERE b.status = 'completed'"
-    );
+    public static function cancel_my_booking( WP_REST_Request $request ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mitii_bookings';
+        $id    = intval( $request['id'] );
 
-    return rest_ensure_response( array(
-        'series'  => $series,
-        'summary' => array(
-            'total_bookings'    => $total_bookings,
-            'upcoming_bookings' => $upcoming,
-            'pending_bookings'  => $pending,
-            'completed_revenue' => (float) $completed_revenue,
-        ),
-    ) );
-}
+        $wpdb->update(
+            $table,
+            array( 'status' => 'cancelled' ),
+            array( 'id' => $id )
+        );
 
+        return rest_ensure_response( array( 'cancelled' => true ) );
+    }
+
+    public static function update_booking_status( WP_REST_Request $request ) {
+        global $wpdb;
+        $table  = $wpdb->prefix . 'mitii_bookings';
+        $id     = intval( $request['id'] );
+        $status = sanitize_text_field( $request['status'] );
+
+        $allowed = array( 'pending', 'completed', 'cancelled' );
+        if ( ! in_array( $status, $allowed ) ) {
+            return new WP_Error( 'invalid_status', 'Invalid status value.', array( 'status' => 400 ) );
+        }
+
+        $wpdb->update(
+            $table,
+            array( 'status' => $status ),
+            array( 'id' => $id )
+        );
+
+        return rest_ensure_response( array( 'updated' => true ) );
+    }
+
+    public static function get_dashboard_stats() {
+        global $wpdb;
+        $bookings_table = $wpdb->prefix . 'mitii_bookings';
+        $services_table = $wpdb->prefix . 'mitii_services';
+        $staff_table    = $wpdb->prefix . 'mitii_staff';
+
+        $total_bookings   = $wpdb->get_var( "SELECT COUNT(*) FROM $bookings_table" );
+        $pending_bookings = $wpdb->get_var( "SELECT COUNT(*) FROM $bookings_table WHERE status = 'pending'" );
+        $total_revenue    = $wpdb->get_var( "SELECT SUM(s.price) FROM $bookings_table b JOIN $services_table s ON b.service_id = s.id WHERE b.status != 'cancelled'" );
+        $total_services   = $wpdb->get_var( "SELECT COUNT(*) FROM $services_table" );
+        $total_staff      = $wpdb->get_var( "SELECT COUNT(*) FROM $staff_table" );
+
+        return rest_ensure_response( array(
+            'total_bookings'   => intval( $total_bookings ),
+            'pending_bookings' => intval( $pending_bookings ),
+            'total_revenue'    => floatval( $total_revenue ?: 0 ),
+            'total_services'   => intval( $total_services ),
+            'total_staff'      => intval( $total_staff ),
+        ) );
+    }
 }

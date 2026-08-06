@@ -34,7 +34,7 @@ class Mitii_Activator {
         ) $charset_collate;";
         dbDelta( $sql_staff );
 
-        // ---- Availability table (which staff work which days/hours) ----
+        // ---- Availability table ----
         $table_availability = $wpdb->prefix . 'mitii_availability';
         $sql_availability = "CREATE TABLE $table_availability (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -60,103 +60,57 @@ class Mitii_Activator {
             status VARCHAR(20) NOT NULL DEFAULT 'pending',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
-            KEY staff_date (staff_id, booking_date),
-            KEY customer_email (customer_email),
-            KEY service_id (service_id)
+            KEY booking_date (booking_date),
+            KEY staff_date (staff_id, booking_date)
         ) $charset_collate;";
         dbDelta( $sql_bookings );
 
+        // ---- Customers table ----
+        $table_customers = $wpdb->prefix . 'mitii_customers';
+        $sql_customers = "CREATE TABLE $table_customers (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            password_hash VARCHAR(255) NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY email (email)
+        ) $charset_collate;";
+        dbDelta( $sql_customers );
 
+        // ---- Customer sessions table ----
+        $table_sessions = $wpdb->prefix . 'mitii_customer_sessions';
+        $sql_sessions = "CREATE TABLE $table_sessions (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            customer_id BIGINT UNSIGNED NOT NULL,
+            token_hash VARCHAR(64) NOT NULL,
+            expires_at DATETIME NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY token_hash (token_hash),
+            KEY expires_at (expires_at)
+        ) $charset_collate;";
+        dbDelta( $sql_sessions );
 
+        // ---- Holidays table (global shop closures) ----
+        $table_holidays = $wpdb->prefix . 'mitii_holidays';
+        $sql_holidays = "CREATE TABLE $table_holidays (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            holiday_date DATE NOT NULL,
+            name VARCHAR(255) DEFAULT '',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY holiday_date (holiday_date)
+        ) $charset_collate;";
+        dbDelta( $sql_holidays );
 
+        // ---- Custom capability ----
+        $admin_role = get_role( 'administrator' );
+        if ( $admin_role && ! $admin_role->has_cap( 'manage_mitii_bookings' ) ) {
+            $admin_role->add_cap( 'manage_mitii_bookings' );
+        }
 
-// ---- Staff <-> Services junction table ----
-$table_staff_services = $wpdb->prefix . 'mitii_staff_services';
-$sql_staff_services = "CREATE TABLE $table_staff_services (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    staff_id BIGINT UNSIGNED NOT NULL,
-    service_id BIGINT UNSIGNED NOT NULL,
-    PRIMARY KEY (id),
-    UNIQUE KEY staff_service_unique (staff_id, service_id),
-    KEY service_id (service_id)
-) $charset_collate;";
-dbDelta( $sql_staff_services );
-
-
-
-// ---- Mitii customers (separate from wp_users entirely) ----
-$table_customers = $wpdb->prefix . 'mitii_customers';
-$sql_customers = "CREATE TABLE $table_customers (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY email_unique (email)
-) $charset_collate;";
-dbDelta( $sql_customers );
-
-// ---- Active login sessions for customers ----
-$table_sessions = $wpdb->prefix . 'mitii_customer_sessions';
-$sql_sessions = "CREATE TABLE $table_sessions (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    customer_id BIGINT UNSIGNED NOT NULL,
-    token_hash VARCHAR(64) NOT NULL,
-    expires_at DATETIME NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY token_hash_unique (token_hash)
-) $charset_collate;";
-dbDelta( $sql_sessions );
-
-
-
-// ---- Grant the admin-panel capability to Administrators ----
-// Controllers check current_user_can( 'manage_mitii_bookings' ) instead of the
-// blanket 'manage_options', so a future "Booking Manager" role could be added
-// without touching any controller code.
-$admin_role = get_role( 'administrator' );
-if ( $admin_role && ! $admin_role->has_cap( 'manage_mitii_bookings' ) ) {
-    $admin_role->add_cap( 'manage_mitii_bookings' );
-}
-
-// ---- Break times (recurring daily blocks, e.g. lunch) ----
-$table_break_times = $wpdb->prefix . 'mitii_break_times';
-$sql_break_times = "CREATE TABLE $table_break_times (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    staff_id BIGINT UNSIGNED NOT NULL,
-    day_of_week TINYINT DEFAULT NULL COMMENT 'NULL = applies every working day, 0=Sun … 6=Sat',
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    label VARCHAR(100) NOT NULL DEFAULT 'Break',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY staff_day (staff_id, day_of_week)
-) $charset_collate;";
-dbDelta( $sql_break_times );
-
-// ---- Holidays (full-day off for a specific staff member on a specific date) ----
-$table_holidays = $wpdb->prefix . 'mitii_holidays';
-$sql_holidays = "CREATE TABLE $table_holidays (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    staff_id BIGINT UNSIGNED NOT NULL,
-    holiday_date DATE NOT NULL,
-    label VARCHAR(100) NOT NULL DEFAULT 'Holiday',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY staff_date_unique (staff_id, holiday_date),
-    KEY staff_id (staff_id)
-) $charset_collate;";
-dbDelta( $sql_holidays );
-
-// ---- Schedule the daily cleanup of expired customer sessions ----
-Mitii_Session_Cleanup::schedule();
-
-
+        // ---- Schedule session cleanup ----
+        Mitii_Session_Cleanup::schedule();
     }
-
-
-    
-
 }
