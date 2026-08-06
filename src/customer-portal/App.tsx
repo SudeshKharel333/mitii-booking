@@ -3,8 +3,10 @@ import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import BookingsList from './BookingsList';
 import ProfileForm from './ProfileForm';
+import CustomerDashboard from './CustomerDashboard';
 // @ts-ignore: side-effect import for stylesheet without type declarations
 import './portal-styles.css';
+
 type CurrentUser = {
     logged_in: boolean;
     id?: number;
@@ -15,7 +17,7 @@ type CurrentUser = {
 export default function App() {
     const [ user, setUser ] = useState<CurrentUser | null>( null );
     const [ mode, setMode ] = useState<'login' | 'register'>( 'login' );
-    const [ tab, setTab ] = useState<'bookings' | 'profile'>( 'bookings' );
+    const [ tab, setTab ] = useState<'dashboard' | 'bookings' | 'profile'>( 'dashboard' );
     const [ loading, setLoading ] = useState( true );
     const [ loadError, setLoadError ] = useState( '' );
 
@@ -40,11 +42,11 @@ export default function App() {
         fetch( '/wp-json/mitii/v1/customer/logout', {
             method: 'POST',
             credentials: 'same-origin',
-        } ).then( () => checkLoginStatus() );
+        } ).then( () => {
+            setTab( 'dashboard' );
+            checkLoginStatus();
+        } );
     };
-
-    const serviceBookingUrl = ( window as any ).mitiiPortalData?.serviceBookingUrl || '';
-    const staffBookingUrl = ( window as any ).mitiiPortalData?.staffBookingUrl || '';
 
     if ( loading ) {
         return (
@@ -90,19 +92,37 @@ export default function App() {
         );
     }
 
+    const initials = ( user.name || '?' )
+        .split( ' ' )
+        .map( w => w[ 0 ] )
+        .join( '' )
+        .slice( 0, 2 )
+        .toUpperCase();
+
     return (
-        <div className="mitii-portal-ticket" style={ { maxWidth: '640px' } }>
+        <div className="mitii-portal-ticket mitii-portal-ticket-wide">
+            {/* ── App-bar style header ── */}
             <div className="mitii-portal-ticket-header mitii-portal-ticket-header-row">
-                <div>
-                    <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
-                    <h2 className="mitii-portal-ticket-title">{ user.name }</h2>
+                <div className="mitii-portal-identity">
+                    <div className="mitii-portal-avatar-sm">{ initials }</div>
+                    <div>
+                        <p className="mitii-portal-ticket-eyebrow">Mitii Booking</p>
+                        <h2 className="mitii-portal-ticket-title">{ user.name }</h2>
+                    </div>
                 </div>
                 <button className="mitii-portal-logout" onClick={ handleLogout }>
                     Log out
                 </button>
             </div>
 
+            {/* ── Tabs ── */}
             <div className="mitii-portal-tabs">
+                <button
+                    className={ `mitii-portal-tab${ tab === 'dashboard' ? ' is-active' : '' }` }
+                    onClick={ () => setTab( 'dashboard' ) }
+                >
+                    Overview
+                </button>
                 <button
                     className={ `mitii-portal-tab${ tab === 'bookings' ? ' is-active' : '' }` }
                     onClick={ () => setTab( 'bookings' ) }
@@ -117,28 +137,18 @@ export default function App() {
                 </button>
             </div>
 
-            { ( serviceBookingUrl || staffBookingUrl ) && (
-                <div className="mitii-portal-new-booking">
-                    <p className="mitii-portal-section-title">Book Another Appointment</p>
-                    <div className="mitii-portal-new-booking-actions">
-                        { serviceBookingUrl && (
-                            <a href={ serviceBookingUrl } className="mitii-portal-btn-outline">
-                                Choose a Service
-                            </a>
-                        ) }
-                        { staffBookingUrl && (
-                            <a href={ staffBookingUrl } className="mitii-portal-btn-outline">
-                                Choose a Staff Member
-                            </a>
-                        ) }
-                    </div>
-                </div>
-            ) }
-
+            {/* ── Tab content ── */}
             <div className="mitii-portal-ticket-body">
-                { tab === 'bookings' ? (
+                { tab === 'dashboard' && (
+                    <CustomerDashboard
+                        userName={ user.name || 'there' }
+                        onGoToBookings={ () => setTab( 'bookings' ) }
+                    />
+                ) }
+                { tab === 'bookings' && (
                     <BookingsList onChanged={ checkLoginStatus } />
-                ) : (
+                ) }
+                { tab === 'profile' && (
                     <ProfileForm
                         user={ user }
                         onUpdated={ checkLoginStatus }

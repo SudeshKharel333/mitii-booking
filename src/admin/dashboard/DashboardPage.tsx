@@ -234,11 +234,11 @@ export default function DashboardPage() {
 
             {/* ── KPI cards ── */}
             <div className="mitii-stat-grid" style={ { gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', marginBottom: 28 } }>
-                <StatCard label="Total Bookings"  value={ fmt( data.totals.bookings ) }  icon="📅" />
-                <StatCard label="Total Revenue"   value={ `$${ data.totals.revenue.toFixed(2) }` } icon="💰" />
-                <StatCard label="Staff Members"   value={ fmt( data.totals.staff ) }     icon="👥" />
-                <StatCard label="Services"        value={ fmt( data.totals.services ) }  icon="🛎️" />
-                <StatCard label="Customers"       value={ fmt( data.totals.customers ) } icon="🙋" />
+                <StatCard label="Total Bookings"  value={ fmt( data.totals.bookings ) }  />
+                <StatCard label="Total Revenue"   value={ `$${ data.totals.revenue.toFixed(2) }` } />
+                <StatCard label="Staff Members"   value={ fmt( data.totals.staff ) }      />
+                <StatCard label="Services"        value={ fmt( data.totals.services ) } />
+                <StatCard label="Customers"       value={ fmt( data.totals.customers ) } />
             </div>
 
             {/* ── Today + This month ── */}
@@ -368,10 +368,9 @@ export default function DashboardPage() {
 
 // ── Small reusable stat card ──────────────────────────────────────────────────
 
-function StatCard( { label, value, icon }: { label: string; value: string; icon: string } ) {
+function StatCard( { label, value }: { label: string; value: string } ) {
     return (
         <div className="mitii-stat-card" style={ { display: 'flex', alignItems: 'center', gap: 14 } }>
-            <div style={ { fontSize: 28, lineHeight: 1 } }>{ icon }</div>
             <div>
                 <div style={ { fontSize: 22, fontWeight: 800, color: 'var(--mitii-teal-dark)', lineHeight: 1.1 } }>{ value }</div>
                 <div className="mitii-hint" style={ { marginTop: 3 } }>{ label }</div>

@@ -279,6 +279,45 @@
   margin: 0 auto;
 }
 
+/* Wider variant — logged-in dashboard */
+.mitii-portal-ticket-wide {
+  /* Break out of whatever narrow content container the theme applies */
+  width: calc(100vw - 48px);
+  max-width: calc(100vw - 48px);
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: calc(-50vw + 24px);
+  margin-right: calc(-50vw + 24px);
+
+  /* Keep rounded corners and a subtle shadow */
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(42, 42, 40, 0.10), 0 1px 4px rgba(42, 42, 40, 0.06);
+}
+
+/* Identity group (avatar + name/eyebrow) */
+.mitii-portal-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Small avatar circle in the header */
+.mitii-portal-avatar-sm {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--mitii-gold);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
 .mitii-portal-ticket-header {
   background: var(--mitii-teal);
   color: #fff;
@@ -317,7 +356,7 @@
 }
 
 .mitii-portal-ticket-body {
-  padding: 30px 26px 26px;
+  padding: 28px 30px 30px;
 }
 
 .mitii-portal-ticket-header-row {
@@ -330,7 +369,7 @@
 .mitii-portal-tabs {
   display: flex;
   gap: 4px;
-  padding: 14px 26px 0;
+  padding: 14px 30px 0;
   background: var(--mitii-paper);
 }
 
@@ -352,37 +391,6 @@
 .mitii-portal-tab.is-active {
   color: var(--mitii-teal-dark);
   border-bottom-color: var(--mitii-teal);
-}
-
-/* ---- New-booking shortcuts (links to the service/staff booking pages) ---- */
-.mitii-portal-new-booking {
-  padding: 18px 26px 0;
-  background: var(--mitii-paper);
-}
-
-.mitii-portal-new-booking-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.mitii-portal-btn-outline {
-  display: inline-block;
-  background: #fff;
-  color: var(--mitii-teal-dark);
-  border: 1px solid var(--mitii-teal);
-  padding: 9px 16px;
-  border-radius: 9px;
-  font-size: 13px;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
-}
-.mitii-portal-btn-outline:hover {
-  background: var(--mitii-teal);
-  color: #fff;
-  box-shadow: var(--elevation-1);
 }
 
 /* ---- Inline success message (mirrors .mitii-portal-error) ---- */
