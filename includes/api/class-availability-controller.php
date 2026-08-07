@@ -25,32 +25,35 @@ class Mitii_Availability_Controller {
         ) );
     }
 
-    public static function check_admin_permission() {
-        return function( WP_REST_Request $request ) {
-            if ( ! current_user_can( 'manage_mitii_bookings' ) ) {
-                return new WP_Error(
-                    'rest_forbidden',
-                    __( 'You do not have permission to manage availability.' ),
-                    array( 'status' => 403 )
-                );
-            }
+    /**
+     * FIX Bug 2: was returning a closure, which WordPress treats as truthy
+     * and never actually called — meaning the permission check was bypassed entirely.
+     * Now it's a proper static method that WordPress calls directly.
+     */
+    public static function check_admin_permission( WP_REST_Request $request ) {
+        if ( ! current_user_can( 'manage_mitii_bookings' ) ) {
+            return new WP_Error(
+                'rest_forbidden',
+                __( 'You do not have permission to manage availability.' ),
+                array( 'status' => 403 )
+            );
+        }
 
-            $nonce = $request->get_header( 'x_mitii_nonce' );
-            if ( $nonce && ! wp_verify_nonce( $nonce, 'mitii_bookings_nonce' ) ) {
-                return new WP_Error(
-                    'rest_invalid_nonce',
-                    __( 'Invalid security token.' ),
-                    array( 'status' => 403 )
-                );
-            }
+        $nonce = $request->get_header( 'x_mitii_nonce' );
+        if ( $nonce && ! wp_verify_nonce( $nonce, 'mitii_bookings_nonce' ) ) {
+            return new WP_Error(
+                'rest_invalid_nonce',
+                __( 'Invalid security token.' ),
+                array( 'status' => 403 )
+            );
+        }
 
-            return true;
-        };
+        return true;
     }
 
     public static function get_availability( WP_REST_Request $request ) {
         global $wpdb;
-        $table = $wpdb->prefix . 'mitii_availability';
+        $table    = $wpdb->prefix . 'mitii_availability';
         $staff_id = intval( $request['staff_id'] );
 
         $results = $wpdb->get_results(
@@ -65,7 +68,7 @@ class Mitii_Availability_Controller {
 
     public static function set_availability( WP_REST_Request $request ) {
         global $wpdb;
-        $table = $wpdb->prefix . 'mitii_availability';
+        $table    = $wpdb->prefix . 'mitii_availability';
         $staff_id = intval( $request['staff_id'] );
         $slots    = $request->get_json_params();
 
@@ -93,12 +96,33 @@ class Mitii_Availability_Controller {
             return rest_ensure_response( array() );
         }
 
-        $staff_id = intval( $request['staff_id'] );
-        return rest_ensure_response( self::get_available_slots( $staff_id, $date ) );
+        $staff_id  = intval( $request['staff_id'] );
+        $service_id = intval( $request->get_param( 'service_id' ) );
+
+        return rest_ensure_response( self::get_available_slots( $staff_id, $date, $service_id ) );
     }
 
-    public static function get_available_slots( $staff_id, $date ) {
+    /**
+     * FIX Bug 6: accepts optional $service_id and uses the service's duration_minutes
+     * for slot size instead of always using the hardcoded SLOT_MINUTES (30).
+     * Falls back to SLOT_MINUTES if no service_id is given or service not found.
+     */
+    public static function get_available_slots( $staff_id, $date, $service_id = 0 ) {
         global $wpdb;
+
+        // Determine slot duration from the requested service
+        $slot_minutes = self::SLOT_MINUTES; // default 30
+        if ( $service_id ) {
+            $duration = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT duration_minutes FROM {$wpdb->prefix}mitii_services WHERE id = %d",
+                    $service_id
+                )
+            );
+            if ( $duration ) {
+                $slot_minutes = intval( $duration );
+            }
+        }
 
         $day_of_week = intval( date( 'w', strtotime( $date ) ) );
         $avail_table = $wpdb->prefix . 'mitii_availability';
@@ -134,12 +158,12 @@ class Mitii_Availability_Controller {
             $start = strtotime( $wh->start_time );
             $end   = strtotime( $wh->end_time );
 
-            while ( $start < $end ) {
+            while ( ( $start + $slot_minutes * 60 ) <= $end ) {
                 $slot_time = date( 'H:i:s', $start );
                 if ( ! in_array( $slot_time, $booked_times ) ) {
                     $slots[] = $slot_time;
                 }
-                $start += self::SLOT_MINUTES * 60;
+                $start += $slot_minutes * 60;
             }
         }
 
