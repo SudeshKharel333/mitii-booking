@@ -23,7 +23,7 @@ const RANGE_OPTIONS = [
 function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' | 'staff' | 'customers' } ) {
     return (
         <div className="mitii-nav-pills">
-            <a href="admin.php?page=mitii-dashboard" className={ `mitii-nav-pill${ active === 'dashboard' ? ' is-active' : '' }` }>
+<a href="admin.php?page=mitii-booking" className={ `mitii-nav-pill${ active === 'dashboard' ? ' is-active' : '' }` }>
                 Dashboard
             </a>
             <a href="admin.php?page=mitii-bookings" className={ `mitii-nav-pill${ active === 'bookings' ? ' is-active' : '' }` }>
