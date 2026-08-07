@@ -144,7 +144,6 @@ class Mitii_Schedule_Extras_Controller {
         ) );
     }
 
-    /** PUT /mitii/v1/staff/{id}/break-times/{break_id} */
     public static function update_break_time( $request ) {
         global $wpdb;
         $staff_id    = intval( $request['staff_id'] );
@@ -196,7 +195,8 @@ class Mitii_Schedule_Extras_Controller {
     public static function get_holidays( $request ) {
         global $wpdb;
         $staff_id = intval( $request['staff_id'] );
-        $table    = $wpdb->prefix . 'mitii_holidays';
+       
+        $table    = $wpdb->prefix . 'mitii_staff_holidays';
 
         $rows = $wpdb->get_results(
             $wpdb->prepare(
@@ -215,7 +215,7 @@ class Mitii_Schedule_Extras_Controller {
     public static function add_holiday( $request ) {
         global $wpdb;
         $staff_id     = intval( $request['staff_id'] );
-        $table        = $wpdb->prefix . 'mitii_holidays';
+        $table        = $wpdb->prefix . 'mitii_staff_holidays'; 
         $holiday_date = sanitize_text_field( $request['holiday_date'] ?? '' );
         $label        = sanitize_text_field( $request['label'] ?? 'Holiday' );
 
@@ -257,7 +257,7 @@ class Mitii_Schedule_Extras_Controller {
     /** DELETE /mitii/v1/staff/{id}/holidays/{holiday_id} */
     public static function delete_holiday( $request ) {
         global $wpdb;
-        $table      = $wpdb->prefix . 'mitii_holidays';
+        $table      = $wpdb->prefix . 'mitii_staff_holidays'; 
         $holiday_id = intval( $request['holiday_id'] );
         $staff_id   = intval( $request['staff_id'] );
 
@@ -275,7 +275,7 @@ class Mitii_Schedule_Extras_Controller {
      */
     public static function is_holiday( $staff_id, $date ) {
         global $wpdb;
-        $table = $wpdb->prefix . 'mitii_holidays';
+        $table = $wpdb->prefix . 'mitii_staff_holidays'; 
         $count = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT COUNT(*) FROM $table WHERE staff_id = %d AND holiday_date = %s",
