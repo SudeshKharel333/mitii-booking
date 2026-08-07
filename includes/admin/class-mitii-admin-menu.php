@@ -20,13 +20,11 @@ class Mitii_Admin_Menu {
             'Mitii Booking',
             'manage_mitii_bookings',
             'mitii-booking',
-            array( __CLASS__, 'render_dashboard' ),
             'dashicons-calendar-alt',
             26
         );
 
         // Submenus
-        add_submenu_page( 'mitii-booking', 'Dashboard',  'Dashboard',  'manage_mitii_bookings', 'mitii-booking',   array( __CLASS__, 'render_dashboard' ) );
         add_submenu_page( 'mitii-booking', 'Bookings',   'Bookings',   'manage_mitii_bookings', 'mitii-bookings',  array( __CLASS__, 'render_bookings' ) );
         add_submenu_page( 'mitii-booking', 'Services',   'Services',   'manage_mitii_bookings', 'mitii-services',  array( __CLASS__, 'render_services' ) );
         add_submenu_page( 'mitii-booking', 'Staff',      'Staff',      'manage_mitii_bookings', 'mitii-staff',     array( __CLASS__, 'render_staff' ) );
@@ -36,10 +34,7 @@ class Mitii_Admin_Menu {
 
     // ── Page renderers ─────────────────────────────────────────────────────────
 
-    public static function render_dashboard() {
-        echo '<div class="wrap"><div id="mitii-dashboard-root"></div></div>';
-    }
-
+    
     public static function render_bookings() {
         echo '<div class="wrap"><div id="mitii-bookings-root"></div></div>';
     }
@@ -96,7 +91,6 @@ class Mitii_Admin_Menu {
 
     public static function enqueue_assets( $hook ) {
         $map = array(
-            'toplevel_page_mitii-booking'        => array( 'admin-dashboard', 'mitii-admin-dashboard' ),
             'mitii-booking_page_mitii-bookings'  => array( 'admin-bookings',  'mitii-admin-bookings'  ),
             'mitii-booking_page_mitii-services'  => array( 'admin-services',  'mitii-admin-services'  ),
             'mitii-booking_page_mitii-staff'     => array( 'admin-staff',     'mitii-admin-staff'     ),
