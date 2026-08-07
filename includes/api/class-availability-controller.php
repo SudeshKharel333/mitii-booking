@@ -25,11 +25,7 @@ class Mitii_Availability_Controller {
         ) );
     }
 
-    /**
-     * FIX Bug 2: was returning a closure, which WordPress treats as truthy
-     * and never actually called — meaning the permission check was bypassed entirely.
-     * Now it's a proper static method that WordPress calls directly.
-     */
+   
     public static function check_admin_permission( WP_REST_Request $request ) {
         if ( ! current_user_can( 'manage_mitii_bookings' ) ) {
             return new WP_Error(
@@ -102,13 +98,14 @@ class Mitii_Availability_Controller {
         return rest_ensure_response( self::get_available_slots( $staff_id, $date, $service_id ) );
     }
 
-    /**
-     * FIX Bug 6: accepts optional $service_id and uses the service's duration_minutes
-     * for slot size instead of always using the hardcoded SLOT_MINUTES (30).
-     * Falls back to SLOT_MINUTES if no service_id is given or service not found.
-     */
+   
     public static function get_available_slots( $staff_id, $date, $service_id = 0 ) {
         global $wpdb;
+
+      
+        if ( Mitii_Schedule_Extras_Controller::is_holiday( $staff_id, $date ) ) {
+            return array();
+        }
 
         // Determine slot duration from the requested service
         $slot_minutes = self::SLOT_MINUTES; // default 30
@@ -127,6 +124,9 @@ class Mitii_Availability_Controller {
         $day_of_week = intval( date( 'w', strtotime( $date ) ) );
         $avail_table = $wpdb->prefix . 'mitii_availability';
         $book_table  = $wpdb->prefix . 'mitii_bookings';
+
+       
+        $break_ranges = Mitii_Schedule_Extras_Controller::get_break_ranges( $staff_id, $day_of_week );
 
         $working_hours = $wpdb->get_results(
             $wpdb->prepare(
@@ -159,8 +159,20 @@ class Mitii_Availability_Controller {
             $end   = strtotime( $wh->end_time );
 
             while ( ( $start + $slot_minutes * 60 ) <= $end ) {
-                $slot_time = date( 'H:i:s', $start );
-                if ( ! in_array( $slot_time, $booked_times ) ) {
+                $slot_time        = date( 'H:i:s', $start );
+                $slot_start_mins  = intval( date( 'H', $start ) ) * 60 + intval( date( 'i', $start ) );
+                $slot_end_mins    = $slot_start_mins + $slot_minutes;
+
+                // FIX Bug 10: skip any slot that overlaps a break range.
+                $in_break = false;
+                foreach ( $break_ranges as $range ) {
+                    if ( $slot_start_mins < $range[1] && $slot_end_mins > $range[0] ) {
+                        $in_break = true;
+                        break;
+                    }
+                }
+
+                if ( ! $in_break && ! in_array( $slot_time, $booked_times ) ) {
                     $slots[] = $slot_time;
                 }
                 $start += $slot_minutes * 60;

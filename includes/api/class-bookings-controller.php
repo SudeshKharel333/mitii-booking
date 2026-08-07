@@ -150,6 +150,23 @@ class Mitii_Bookings_Controller {
             );
         }
 
+        // FIX Bug 11: booking_time was never checked against actual
+        // availability — not working hours, not existing bookings, not
+        // breaks, not the staff member's own holidays. Any client could
+        // POST any time and it would be inserted, silently double-booking
+        // the staff member. This re-uses the same slot computation the
+        // availability endpoint shows the customer, and rejects anything
+        // that isn't currently a real open slot.
+        $normalized_time = ( strlen( $booking_time ) === 5 ) ? $booking_time . ':00' : $booking_time;
+        $available_slots = Mitii_Availability_Controller::get_available_slots( $staff_id, $booking_date, $service_id );
+        if ( ! in_array( $normalized_time, $available_slots, true ) ) {
+            return new WP_Error(
+                'slot_unavailable',
+                'That time is no longer available. Please choose another slot.',
+                array( 'status' => 409 )
+            );
+        }
+
         $wpdb->insert( $table, array(
             'service_id'     => $service_id,
             'staff_id'       => $staff_id,
@@ -190,10 +207,37 @@ class Mitii_Bookings_Controller {
         return rest_ensure_response( $results );
     }
 
+    /**
+     * FIX Bug 7: this endpoint checked that the requester was logged in as
+     * *some* customer, but never verified the booking id actually belonged
+     * to them — any logged-in customer could cancel any other customer's
+     * booking just by guessing/incrementing the id (IDOR). It now only
+     * updates a row that matches both the id and the current customer's
+     * own email, and reports 404 if that row doesn't exist.
+     */
     public static function cancel_my_booking( WP_REST_Request $request ) {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_bookings';
         $id    = intval( $request['id'] );
+
+        $customer_id = Mitii_Customer_Session::get_current_customer_id();
+        if ( ! $customer_id ) {
+            return new WP_Error( 'not_logged_in', 'You must be logged in.', array( 'status' => 401 ) );
+        }
+
+        $booking = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT b.id FROM $table b
+                 WHERE b.id = %d
+                 AND b.customer_email = (SELECT email FROM {$wpdb->prefix}mitii_customers WHERE id = %d)",
+                $id,
+                $customer_id
+            )
+        );
+
+        if ( ! $booking ) {
+            return new WP_Error( 'not_found', 'Booking not found.', array( 'status' => 404 ) );
+        }
 
         $wpdb->update(
             $table,
