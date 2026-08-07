@@ -66,28 +66,33 @@ class Mitii_Admin_Menu {
     wp_localize_script( $handle, 'mitiiSettingsData', $data );
 }
 
-    private static function enqueue_bundle( $slug, $handle ) {
-        $asset_path = MITII_PLUGIN_DIR . "build/{$slug}.asset.php";
-        if ( ! file_exists( $asset_path ) ) {
-            return; // bundle not built yet — skip silently, no fatal error
-        }
-        $asset = include $asset_path;
-
-        wp_enqueue_script(
-            $handle,
-            MITII_PLUGIN_URL . "build/{$slug}.js",
-            $asset['dependencies'],
-            $asset['version'],
-            true
-        );
-
-        $css = MITII_PLUGIN_DIR . "build/{$slug}.css";
-        if ( file_exists( $css ) ) {
-            wp_enqueue_style( $handle . '-style', MITII_PLUGIN_URL . "build/{$slug}.css", array(), $asset['version'] );
-        }
-
-        self::localize( $handle );
+  private static function enqueue_bundle( $slug, $handle ) {
+    // FIX: Load WordPress Media Library for pages with image uploaders
+    if ( in_array( $slug, array( 'admin-services', 'admin-staff' ), true ) ) {
+        wp_enqueue_media();
     }
+
+    $asset_path = MITII_PLUGIN_DIR . "build/{$slug}.asset.php";
+    if ( ! file_exists( $asset_path ) ) {
+        return;
+    }
+    $asset = include $asset_path;
+
+    wp_enqueue_script(
+        $handle,
+        MITII_PLUGIN_URL . "build/{$slug}.js",
+        $asset['dependencies'],
+        $asset['version'],
+        true
+    );
+
+    $css = MITII_PLUGIN_DIR . "build/{$slug}.css";
+    if ( file_exists( $css ) ) {
+        wp_enqueue_style( $handle . '-style', MITII_PLUGIN_URL . "build/{$slug}.css", array(), $asset['version'] );
+    }
+
+    self::localize( $handle );
+}
 
     public static function enqueue_assets( $hook ) {
         $map = array(
