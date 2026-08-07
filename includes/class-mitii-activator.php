@@ -104,6 +104,44 @@ class Mitii_Activator {
         ) $charset_collate;";
         dbDelta( $sql_holidays );
 
+        // ---- FIX Bug 8/9: per-staff holidays table ----
+        // Previously missing entirely — Mitii_Schedule_Extras_Controller was
+        // reading/writing staff_id and label columns on the *global*
+        // mitii_holidays table above, which has neither column and is
+        // UNIQUE on holiday_date alone (so it can't hold one row per staff
+        // member per date anyway). Per-staff holidays now get their own
+        // table, scoped and de-duplicated per staff member.
+        $table_staff_holidays = $wpdb->prefix . 'mitii_staff_holidays';
+        $sql_staff_holidays = "CREATE TABLE $table_staff_holidays (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            staff_id BIGINT UNSIGNED NOT NULL,
+            holiday_date DATE NOT NULL,
+            label VARCHAR(255) DEFAULT '',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY staff_date (staff_id, holiday_date)
+        ) $charset_collate;";
+        dbDelta( $sql_staff_holidays );
+
+        // ---- FIX Bug 8: break times table ----
+        // Previously missing entirely — Mitii_Schedule_Extras_Controller
+        // read/wrote this table in get_break_times(), add_break_time(),
+        // update_break_time(), delete_break_time(), and get_break_ranges(),
+        // but it was never created, so every break-time API call failed.
+        $table_break_times = $wpdb->prefix . 'mitii_break_times';
+        $sql_break_times = "CREATE TABLE $table_break_times (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            staff_id BIGINT UNSIGNED NOT NULL,
+            day_of_week TINYINT NULL,
+            start_time TIME NOT NULL,
+            end_time TIME NOT NULL,
+            label VARCHAR(255) DEFAULT 'Break',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY staff_day (staff_id, day_of_week)
+        ) $charset_collate;";
+        dbDelta( $sql_break_times );
+
         // ---- Custom capability ----
         $admin_role = get_role( 'administrator' );
         if ( $admin_role && ! $admin_role->has_cap( 'manage_mitii_bookings' ) ) {
