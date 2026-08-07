@@ -9,6 +9,7 @@ module.exports = {
     'admin-bookings': path.resolve( __dirname, 'src/admin/bookings', 'index.tsx' ),
     'admin-services': path.resolve( __dirname, 'src/admin/services', 'index.tsx' ),
     'admin-customers': path.resolve( __dirname, 'src/admin/customers', 'index.tsx' ),
+    'admin-settings': path.resolve( __dirname, 'src/admin/admin-settings',   'index.tsx' ),
     'admin-staff': path.resolve( __dirname, 'src/admin/staff', 'index.tsx' ),
     'public-widget': path.resolve( __dirname, 'src/public-widget', 'index.tsx' ),
     'public-widget-by-staff': path.resolve( __dirname, 'src/public-widget-by-staff', 'index.tsx' ),
