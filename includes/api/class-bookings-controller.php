@@ -68,13 +68,36 @@ class Mitii_Bookings_Controller {
         return Mitii_Customer_Session::get_current_customer_id() !== null;
     }
 
-    public static function get_bookings() {
+   
+    public static function get_bookings( WP_REST_Request $request ) {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_bookings';
-        $results = $wpdb->get_results( "SELECT * FROM $table ORDER BY booking_date DESC, booking_time DESC" );
-        return rest_ensure_response( $results );
+
+        $per_page = max( 1, min( 100, intval( $request->get_param( 'per_page' ) ?: 20 ) ) );
+        $page     = max( 1, intval( $request->get_param( 'page' ) ?: 1 ) );
+        $offset   = ( $page - 1 ) * $per_page;
+
+        $total = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $table" ) );
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM $table ORDER BY booking_date DESC, booking_time DESC LIMIT %d OFFSET %d",
+                $per_page,
+                $offset
+            )
+        );
+
+        $response = rest_ensure_response( $results );
+        $response->header( 'X-WP-Total',      $total );
+        $response->header( 'X-WP-TotalPages', ceil( $total / $per_page ) );
+
+        return $response;
     }
 
+    /**
+     * FIX Bug 4: added full input validation before inserting into DB.
+     * Previously, missing or malformed fields were silently inserted as empty/zero values.
+     */
     public static function create_booking( WP_REST_Request $request ) {
         global $wpdb;
         $table = $wpdb->prefix . 'mitii_bookings';
@@ -85,6 +108,38 @@ class Mitii_Bookings_Controller {
         $customer_email = sanitize_email( $request['customer_email'] );
         $booking_date   = sanitize_text_field( $request['booking_date'] );
         $booking_time   = sanitize_text_field( $request['booking_time'] );
+
+        // ── Validate required fields ──
+        if ( ! $service_id || ! $staff_id ) {
+            return new WP_Error( 'missing_ids', 'A valid service and staff member are required.', array( 'status' => 400 ) );
+        }
+        if ( empty( $customer_name ) ) {
+            return new WP_Error( 'missing_name', 'Customer name is required.', array( 'status' => 400 ) );
+        }
+        if ( ! is_email( $customer_email ) ) {
+            return new WP_Error( 'invalid_email', 'A valid email address is required.', array( 'status' => 400 ) );
+        }
+        if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $booking_date ) ) {
+            return new WP_Error( 'invalid_date', 'Date must be in YYYY-MM-DD format.', array( 'status' => 400 ) );
+        }
+        if ( ! preg_match( '/^\d{2}:\d{2}(:\d{2})?$/', $booking_time ) ) {
+            return new WP_Error( 'invalid_time', 'Time must be in HH:MM or HH:MM:SS format.', array( 'status' => 400 ) );
+        }
+
+        // ── Verify service and staff actually exist ──
+        $service_exists = $wpdb->get_var( $wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}mitii_services WHERE id = %d", $service_id
+        ) );
+        if ( ! $service_exists ) {
+            return new WP_Error( 'invalid_service', 'The selected service does not exist.', array( 'status' => 400 ) );
+        }
+
+        $staff_exists = $wpdb->get_var( $wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}mitii_staff WHERE id = %d", $staff_id
+        ) );
+        if ( ! $staff_exists ) {
+            return new WP_Error( 'invalid_staff', 'The selected staff member does not exist.', array( 'status' => 400 ) );
+        }
 
         // 🌴 GLOBAL HOLIDAY GUARD — reject bookings on closure days
         if ( Mitii_Holidays_Controller::is_holiday( $booking_date ) ) {
