@@ -62,12 +62,14 @@ class Mitii_Admin_Menu {
 
     // ── Asset enqueuing ────────────────────────────────────────────────────────
 
-    private static function localize( $handle ) {
-        wp_localize_script( $handle, 'mitiiAdminData', array(
-            'restUrl' => esc_url_raw( rest_url( 'mitii/v1' ) ),
-            'nonce'   => wp_create_nonce( 'wp_rest' ),  // must be wp_rest for WP REST API cookie auth
-        ) );
-    }
+  private static function localize( $handle ) {
+    $data = array(
+        'restUrl' => esc_url_raw( rest_url( 'mitii/v1' ) ),
+        'nonce'   => wp_create_nonce( 'wp_rest' ),
+    );
+    wp_localize_script( $handle, 'mitiiAdminData',    $data );
+    wp_localize_script( $handle, 'mitiiSettingsData', $data );
+}
 
     private static function enqueue_bundle( $slug, $handle ) {
         $asset_path = MITII_PLUGIN_DIR . "build/{$slug}.asset.php";
