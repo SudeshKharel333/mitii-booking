@@ -34,18 +34,23 @@ require_once MITII_PLUGIN_DIR . 'includes/api/class-bookings-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-customer-auth-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-customers-admin-controller.php';
 require_once MITII_PLUGIN_DIR . 'includes/api/class-holidays-controller.php';
+require_once MITII_PLUGIN_DIR . 'includes/api/class-schedule-extras-controller.php'; // FIX Bug 3: was loaded but never required
+require_once MITII_PLUGIN_DIR . 'includes/api/class-dashboard-controller.php';       // FIX Bug 3: was loaded but never required
 
 // ── Activation / Deactivation ──
 register_activation_hook( __FILE__, array( 'Mitii_Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'Mitii_Deactivator', 'deactivate' ) );
 
 // ── Hooks ──
-add_action( 'rest_api_init', array( 'Mitii_Services_Controller',      'register_routes' ) );
-add_action( 'rest_api_init', array( 'Mitii_Staff_Controller',         'register_routes' ) );
-add_action( 'rest_api_init', array( 'Mitii_Availability_Controller',    'register_routes' ) );
-add_action( 'rest_api_init', array( 'Mitii_Bookings_Controller',      'register_routes' ) );
-add_action( 'rest_api_init', array( 'Mitii_Customer_Auth_Controller', 'register_routes' ) );
-add_action( 'rest_api_init', array( 'Mitii_Holidays_Controller',      'register_routes' ) );
+add_action( 'rest_api_init', array( 'Mitii_Services_Controller',          'register_routes' ) );
+add_action( 'rest_api_init', array( 'Mitii_Staff_Controller',             'register_routes' ) );
+add_action( 'rest_api_init', array( 'Mitii_Availability_Controller',      'register_routes' ) );
+add_action( 'rest_api_init', array( 'Mitii_Bookings_Controller',          'register_routes' ) );
+add_action( 'rest_api_init', array( 'Mitii_Customer_Auth_Controller',     'register_routes' ) );
+add_action( 'rest_api_init', array( 'Mitii_Holidays_Controller',          'register_routes' ) );
+add_action( 'rest_api_init', array( 'Mitii_Customers_Admin_Controller',   'register_routes' ) ); // FIX Bug 3: missing hook
+add_action( 'rest_api_init', array( 'Mitii_Schedule_Extras_Controller',   'register_routes' ) ); // FIX Bug 3: missing hook
+add_action( 'rest_api_init', array( 'Mitii_Dashboard_Controller',         'register_routes' ) ); // FIX Bug 3: missing hook
 
 add_action( 'admin_menu', array( 'Mitii_Admin_Menu',    'register' ) );
 add_action( 'admin_menu', array( 'Mitii_Settings_Page', 'register' ) );
