@@ -34,6 +34,23 @@ class Mitii_Activator {
         ) $charset_collate;";
         dbDelta( $sql_staff );
 
+
+
+$table_staff_services = $wpdb->prefix . 'mitii_staff_services';
+$sql = "CREATE TABLE $table_staff_services (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    staff_id BIGINT UNSIGNED NOT NULL,
+    service_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY staff_service_unique (staff_id, service_id)
+) $charset_collate;";
+dbDelta( $sql );
+
+
+
+
+
+
         // ---- Availability table ----
         $table_availability = $wpdb->prefix . 'mitii_availability';
         $sql_availability = "CREATE TABLE $table_availability (
