@@ -10,16 +10,18 @@ class Mitii_Activator {
 
         // ---- Services table ----
         $table_services = $wpdb->prefix . 'mitii_services';
-        $sql_services = "CREATE TABLE $table_services (
-            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            name VARCHAR(255) NOT NULL,
-            duration_minutes INT NOT NULL DEFAULT 30,
-            price DECIMAL(10,2) NOT NULL DEFAULT 0,
-            image_url VARCHAR(500) DEFAULT '',
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
-        ) $charset_collate;";
-        dbDelta( $sql_services );
+       // in class-mitii-activator.php — update CREATE TABLE mitii_services
+$sql_services = "CREATE TABLE $table_services (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    duration_minutes INT NOT NULL DEFAULT 30,
+    padding_before_minutes INT NOT NULL DEFAULT 0,   // ← ADD
+    padding_after_minutes  INT NOT NULL DEFAULT 0,   // ← ADD
+    price DECIMAL(10,2) NOT NULL DEFAULT 0,
+    image_url VARCHAR(500) DEFAULT '',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) $charset_collate;";
 
         // ---- Staff table ----
         $table_staff = $wpdb->prefix . 'mitii_staff';

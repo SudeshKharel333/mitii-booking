@@ -25,7 +25,6 @@ class Mitii_Availability_Controller {
         ) );
     }
 
-   
     public static function check_admin_permission( WP_REST_Request $request ) {
         if ( ! current_user_can( 'manage_mitii_bookings' ) ) {
             return new WP_Error(
@@ -87,45 +86,52 @@ class Mitii_Availability_Controller {
     public static function get_available_slots_route( WP_REST_Request $request ) {
         $date = sanitize_text_field( $request->get_param( 'date' ) );
 
-        // 🌴 GLOBAL HOLIDAY CHECK — shop closed for everyone
+        // Global holiday check — shop closed for everyone
         if ( $date && Mitii_Holidays_Controller::is_holiday( $date ) ) {
             return rest_ensure_response( array() );
         }
 
-        $staff_id  = intval( $request['staff_id'] );
+        $staff_id   = intval( $request['staff_id'] );
         $service_id = intval( $request->get_param( 'service_id' ) );
 
         return rest_ensure_response( self::get_available_slots( $staff_id, $date, $service_id ) );
     }
 
-   
     public static function get_available_slots( $staff_id, $date, $service_id = 0 ) {
         global $wpdb;
 
-      
+        // Per-staff holiday check
         if ( Mitii_Schedule_Extras_Controller::is_holiday( $staff_id, $date ) ) {
             return array();
         }
 
-        // Determine slot duration from the requested service
-        $slot_minutes = self::SLOT_MINUTES; // default 30
+        // ── Service metadata ─────────────────────────────────────────────────
+        // Fetch duration + padding for the requested service in one query.
+        $slot_minutes   = self::SLOT_MINUTES;
+        $req_pad_before = 0;
+        $req_pad_after  = 0;
+
         if ( $service_id ) {
-            $duration = $wpdb->get_var(
+            $svc = $wpdb->get_row(
                 $wpdb->prepare(
-                    "SELECT duration_minutes FROM {$wpdb->prefix}mitii_services WHERE id = %d",
+                    "SELECT duration_minutes, padding_before_minutes, padding_after_minutes
+                     FROM {$wpdb->prefix}mitii_services
+                     WHERE id = %d",
                     $service_id
                 )
             );
-            if ( $duration ) {
-                $slot_minutes = intval( $duration );
+            if ( $svc ) {
+                $slot_minutes   = intval( $svc->duration_minutes );
+                $req_pad_before = intval( $svc->padding_before_minutes );
+                $req_pad_after  = intval( $svc->padding_after_minutes );
             }
         }
 
-        $day_of_week = intval( date( 'w', strtotime( $date ) ) );
+        // ── Working hours + break ranges ─────────────────────────────────────
+        $day_of_week = intval( gmdate( 'w', strtotime( $date ) ) );
         $avail_table = $wpdb->prefix . 'mitii_availability';
         $book_table  = $wpdb->prefix . 'mitii_bookings';
 
-       
         $break_ranges = Mitii_Schedule_Extras_Controller::get_break_ranges( $staff_id, $day_of_week );
 
         $working_hours = $wpdb->get_results(
@@ -140,46 +146,95 @@ class Mitii_Availability_Controller {
             return array();
         }
 
+        // ── Existing bookings → blocked ranges ───────────────────────────────
+        // Fetch each booking's service duration + padding so we can compute
+        // exactly how long that booking blocks the calendar, including gaps.
         $bookings = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT booking_time, status FROM $book_table WHERE staff_id = %d AND booking_date = %s AND status != 'cancelled'",
+                "SELECT b.booking_time,
+                        COALESCE(s.duration_minutes, 30)       AS duration_minutes,
+                        COALESCE(s.padding_before_minutes, 0)  AS padding_before_minutes,
+                        COALESCE(s.padding_after_minutes, 0)   AS padding_after_minutes
+                 FROM $book_table b
+                 LEFT JOIN {$wpdb->prefix}mitii_services s ON b.service_id = s.id
+                 WHERE b.staff_id = %d
+                   AND b.booking_date = %s
+                   AND b.status != 'cancelled'",
                 $staff_id,
                 $date
             )
         );
 
-        $booked_times = array();
+        // Each entry: [ blocked_start_mins, blocked_end_mins ]
+        $booked_ranges = array();
         foreach ( $bookings as $b ) {
-            $booked_times[] = $b->booking_time;
+            $start_mins  = self::time_to_minutes( $b->booking_time );
+            $duration    = intval( $b->duration_minutes );
+            $pad_before  = intval( $b->padding_before_minutes );
+            $pad_after   = intval( $b->padding_after_minutes );
+
+            $booked_ranges[] = array(
+                $start_mins - $pad_before,
+                $start_mins + $duration + $pad_after,
+            );
         }
 
+        // ── Generate slots ───────────────────────────────────────────────────
         $slots = array();
+
         foreach ( $working_hours as $wh ) {
             $start = strtotime( $wh->start_time );
             $end   = strtotime( $wh->end_time );
 
             while ( ( $start + $slot_minutes * 60 ) <= $end ) {
-                $slot_time        = date( 'H:i:s', $start );
-                $slot_start_mins  = intval( date( 'H', $start ) ) * 60 + intval( date( 'i', $start ) );
-                $slot_end_mins    = $slot_start_mins + $slot_minutes;
+                $slot_time       = gmdate( 'H:i:s', $start );
+                $slot_start_mins = intval( gmdate( 'H', $start ) ) * 60 + intval( gmdate( 'i', $start ) );
+                $slot_end_mins   = $slot_start_mins + $slot_minutes;
 
-                // FIX Bug 10: skip any slot that overlaps a break range.
+                // The full calendar block this candidate slot would occupy,
+                // including its own padding (before + after).
+                $candidate_block_start = $slot_start_mins - $req_pad_before;
+                $candidate_block_end   = $slot_end_mins   + $req_pad_after;
+
+                // Skip if this slot's block overlaps any break.
                 $in_break = false;
                 foreach ( $break_ranges as $range ) {
-                    if ( $slot_start_mins < $range[1] && $slot_end_mins > $range[0] ) {
+                    if ( $candidate_block_start < $range[1] && $candidate_block_end > $range[0] ) {
                         $in_break = true;
                         break;
                     }
                 }
 
-                if ( ! $in_break && ! in_array( $slot_time, $booked_times ) ) {
+                // Skip if this slot's block overlaps any existing booking's block.
+                $is_booked = false;
+                if ( ! $in_break ) {
+                    foreach ( $booked_ranges as $range ) {
+                        if ( $candidate_block_start < $range[1] && $candidate_block_end > $range[0] ) {
+                            $is_booked = true;
+                            break;
+                        }
+                    }
+                }
+
+                if ( ! $in_break && ! $is_booked ) {
                     $slots[] = $slot_time;
                 }
+
                 $start += $slot_minutes * 60;
             }
         }
 
         sort( $slots );
         return $slots;
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    /**
+     * Convert "HH:MM" or "HH:MM:SS" to total minutes since midnight.
+     */
+    private static function time_to_minutes( $time_str ) {
+        $parts = explode( ':', $time_str );
+        return intval( $parts[0] ) * 60 + intval( $parts[1] );
     }
 }
