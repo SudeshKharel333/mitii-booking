@@ -14,18 +14,27 @@ class Mitii_Admin_Menu {
     }
 
     public static function add_menu() {
-        // Parent menu
+        // Parent menu.
+        // FIX: previous call had shifted args — 'dashicons-calendar-alt' was being passed
+        // as the $callback and 26 as the $icon_url, with no $position set. Corrected below.
+        // The callback here is a fallback only; it's overridden by the 'mitii-booking'
+        // submenu registered below (same slug as parent), which is what actually renders.
         add_menu_page(
             'Mitii Booking',
             'Mitii Booking',
             'manage_mitii_bookings',
             'mitii-booking',
+            array( __CLASS__, 'render_bookings' ),
             'dashicons-calendar-alt',
             26
         );
 
-        // Submenus
-        add_submenu_page( 'mitii-booking', 'Bookings',   'Bookings',   'manage_mitii_bookings', 'mitii-bookings',  array( __CLASS__, 'render_bookings' ) );
+        // Submenus.
+        // NOTE: giving this first submenu the SAME slug as the parent ('mitii-booking')
+        // replaces WordPress's auto-generated duplicate "Mitii Booking" submenu item —
+        // it becomes "Bookings" instead, and clicking the top-level menu now opens
+        // this page directly rather than a blank/duplicate page.
+        add_submenu_page( 'mitii-booking', 'Bookings',   'Bookings',   'manage_mitii_bookings', 'mitii-booking',   array( __CLASS__, 'render_bookings' ) );
         add_submenu_page( 'mitii-booking', 'Services',   'Services',   'manage_mitii_bookings', 'mitii-services',  array( __CLASS__, 'render_services' ) );
         add_submenu_page( 'mitii-booking', 'Staff',      'Staff',      'manage_mitii_bookings', 'mitii-staff',     array( __CLASS__, 'render_staff' ) );
         add_submenu_page( 'mitii-booking', 'Customers',  'Customers',  'manage_mitii_bookings', 'mitii-customers', array( __CLASS__, 'render_customers' ) );
@@ -96,7 +105,10 @@ class Mitii_Admin_Menu {
 
     public static function enqueue_assets( $hook ) {
         $map = array(
-            'mitii-booking_page_mitii-bookings'  => array( 'admin-bookings',  'mitii-admin-bookings'  ),
+            // FIX: the Bookings page now shares the parent menu's slug (see add_menu()),
+            // so its admin hook suffix becomes 'toplevel_page_mitii-booking' instead of
+            // 'mitii-booking_page_mitii-bookings'.
+            'toplevel_page_mitii-booking'        => array( 'admin-bookings',  'mitii-admin-bookings'  ),
             'mitii-booking_page_mitii-services'  => array( 'admin-services',  'mitii-admin-services'  ),
             'mitii-booking_page_mitii-staff'     => array( 'admin-staff',     'mitii-admin-staff'     ),
             'mitii-booking_page_mitii-customers' => array( 'admin-customers', 'mitii-admin-customers' ),

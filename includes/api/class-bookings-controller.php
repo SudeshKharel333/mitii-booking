@@ -53,11 +53,11 @@ class Mitii_Bookings_Controller {
             'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
         ) );
 
-        register_rest_route( 'mitii/v1', '/dashboard/stats', array(
-            'methods'             => 'GET',
-            'callback'            => array( __CLASS__, 'get_dashboard_stats' ),
-            'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
-        ) );
+        // register_rest_route( 'mitii/v1', '/dashboard/stats', array(
+        //     'methods'             => 'GET',
+        //     'callback'            => array( __CLASS__, 'get_dashboard_stats' ),
+        //     'permission_callback' => array( __CLASS__, 'check_admin_permission' ),
+        // ) );
     }
 
     public static function check_admin_permission() {

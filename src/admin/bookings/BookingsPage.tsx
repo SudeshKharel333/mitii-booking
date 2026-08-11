@@ -18,27 +18,7 @@ type Booking = {
 
 const PER_PAGE = 20;
 
-function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' | 'staff' | 'customers' } ) {
-    return (
-        <div className="mitii-nav-pills">
-            <a href="admin.php?page=mitii-dashboard" className={ `mitii-nav-pill${ active === 'dashboard' ? ' is-active' : '' }` }>
-                Dashboard
-            </a>
-            <a href="admin.php?page=mitii-bookings" className={ `mitii-nav-pill${ active === 'bookings' ? ' is-active' : '' }` }>
-                Bookings
-            </a>
-            <a href="admin.php?page=mitii-services" className={ `mitii-nav-pill${ active === 'services' ? ' is-active' : '' }` }>
-                Services
-            </a>
-            <a href="admin.php?page=mitii-staff" className={ `mitii-nav-pill${ active === 'staff' ? ' is-active' : '' }` }>
-                Staff
-            </a>
-            <a href="admin.php?page=mitii-customers" className={ `mitii-nav-pill${ active === 'customers' ? ' is-active' : '' }` }>
-                Customers
-            </a>
-        </div>
-    );
-}
+
 
 export default function BookingsPage() {
     const [ bookings, setBookings ] = useState<Booking[]>( [] );
@@ -100,7 +80,7 @@ export default function BookingsPage() {
     if ( loading && bookings.length === 0 ) {
         return (
             <div className="mitii-admin">
-                <NavPills active="bookings" />
+               
                 <h1>Bookings</h1>
                 <p className="mitii-subtitle">Loading...</p>
             </div>
@@ -117,7 +97,6 @@ export default function BookingsPage() {
 
     return (
         <div className="mitii-admin">
-            <NavPills active="bookings" />
             <h1>Bookings</h1>
             <p className="mitii-subtitle">All appointments booked by customers.</p>
             { error && <p className="mitii-error">{ error }</p> }

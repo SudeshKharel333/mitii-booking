@@ -59,21 +59,7 @@ const authHeaders = () => ( {
 
 // ── Nav ────────────────────────────────────────────────────────────────────
 
-function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' | 'staff' | 'customers' } ) {
-    return (
-        <div className="mitii-nav-pills">
-            { ( [ 'dashboard', 'bookings', 'services', 'staff', 'customers' ] as const ).map( ( page ) => (
-                <a
-                    key={ page }
-                    href={ `admin.php?page=mitii-${ page }` }
-                    className={ `mitii-nav-pill${ active === page ? ' is-active' : '' }` }
-                >
-                    { page.charAt( 0 ).toUpperCase() + page.slice( 1 ) }
-                </a>
-            ) ) }
-        </div>
-    );
-}
+
 
 declare global {
     interface Window { wp: any; }
@@ -352,7 +338,6 @@ export default function StaffPage() {
 
     return (
         <div className="mitii-admin">
-            <NavPills active="staff" />
             <h1>Staff</h1>
             <p className="mitii-subtitle">Manage your team and which services each person offers.</p>
 

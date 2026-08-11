@@ -16,27 +16,6 @@ declare global {
     }
 }
 
-function NavPills( { active }: { active: 'dashboard' | 'bookings' | 'services' | 'staff' | 'customers' } ) {
-    return (
-        <div className="mitii-nav-pills">
-            <a href="admin.php?page=mitii-dashboard" className={ `mitii-nav-pill${ active === 'dashboard' ? ' is-active' : '' }` }>
-                Dashboard
-            </a>
-            <a href="admin.php?page=mitii-bookings" className={ `mitii-nav-pill${ active === 'bookings' ? ' is-active' : '' }` }>
-                Bookings
-            </a>
-            <a href="admin.php?page=mitii-services" className={ `mitii-nav-pill${ active === 'services' ? ' is-active' : '' }` }>
-                Services
-            </a>
-            <a href="admin.php?page=mitii-staff" className={ `mitii-nav-pill${ active === 'staff' ? ' is-active' : '' }` }>
-                Staff
-            </a>
-            <a href="admin.php?page=mitii-customers" className={ `mitii-nav-pill${ active === 'customers' ? ' is-active' : '' }` }>
-                Customers
-            </a>
-        </div>
-    );
-}
 
 export default function ServicesPage() {
     const [ services, setServices ] = useState<Service[]>( [] );
@@ -158,7 +137,6 @@ export default function ServicesPage() {
 
     return (
         <div className="mitii-admin">
-            <NavPills active="services" />
             <h1>Services</h1>
             <p className="mitii-subtitle">Manage what customers can book.</p>
 
